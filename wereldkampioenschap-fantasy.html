@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WK Fantasy League 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ====== DARK THEME (default) ====== */
+  :root, [data-theme="dark"] {
+    --pitch: #0a3d1f;
+    --neon: #39ff6a;
+    --neon-dim: #1d9e40;
+    --gold: #f5c842;
+    --red: #ff3b3b;
+    --fg: #f0f4f0;
+    --fg-muted: #8a9e8a;
+    --bg: #040e08;
+    --card: #0c2818;
+    --border: rgba(57,255,106,0.15);
+    --input-bg: rgba(255,255,255,0.04);
+    --input-focus-bg: rgba(57,255,106,0.04);
+    --grid-line: rgba(57,255,106,0.015);
+    --header-glow: rgba(57,255,106,0.08);
+    --match-card-bg: rgba(255,255,255,0.03);
+    --row-hover: rgba(57,255,106,0.04);
+    --pts-bg: rgba(57,255,106,0.15);
+    --pts-zero-bg: rgba(255,59,59,0.1);
+    --knock-selected: rgba(57,255,106,0.1);
+    --info-pill-bg: rgba(57,255,106,0.08);
+    --pts-ref-bg: rgba(57,255,106,0.06);
+    --detail-score-bg: rgba(57,255,106,0.07);
+    --detail-meta-bg: rgba(57,255,106,0.04);
+    --csv-bg: rgba(0,0,0,0.3);
+    --theme-toggle-icon: '☀️';
+    --select-opt-bg: #0a3d1f;
+  }
+
+  /* ====== LIGHT THEME ====== */
+  [data-theme="light"] {
+    --pitch: #e8f5ee;
+    --neon: #0a8f3a;
+    --neon-dim: #1aaa50;
+    --gold: #c8960a;
+    --red: #d42b2b;
+    --fg: #0d1f12;
+    --fg-muted: #5a7a62;
+    --bg: #f2faf5;
+    --card: #ffffff;
+    --border: rgba(10,143,58,0.2);
+    --input-bg: rgba(0,0,0,0.03);
+    --input-focus-bg: rgba(10,143,58,0.06);
+    --grid-line: rgba(10,143,58,0.04);
+    --header-glow: rgba(10,143,58,0.07);
+    --match-card-bg: rgba(0,0,0,0.02);
+    --row-hover: rgba(10,143,58,0.04);
+    --pts-bg: rgba(10,143,58,0.12);
+    --pts-zero-bg: rgba(212,43,43,0.08);
+    --knock-selected: rgba(10,143,58,0.1);
+    --info-pill-bg: rgba(10,143,58,0.07);
+    --pts-ref-bg: rgba(10,143,58,0.06);
+    --detail-score-bg: rgba(10,143,58,0.07);
+    --detail-meta-bg: rgba(10,143,58,0.04);
+    --csv-bg: rgba(0,0,0,0.04);
+    --theme-toggle-icon: '🌙';
+    --select-opt-bg: #e8f5ee;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 40px, var(--grid-line) 40px, var(--grid-line) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, var(--grid-line) 40px, var(--grid-line) 41px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ====== THEME TOGGLE ====== */
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 20px;
+    z-index: 1000;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+    padding: 8px 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--neon);
+    color: var(--neon);
+  }
+
+  /* ====== HEADER ====== */
+  header {
+    position: relative;
+    text-align: center;
+    padding: 52px 20px 38px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    z-index: 1;
+    transition: border-color 0.3s;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, var(--header-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .trophy-icon {
+    font-size: 52px;
+    display: block;
+    margin-bottom: 10px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(40px, 8vw, 84px);
+    letter-spacing: 4px;
+    color: var(--fg);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  h1 span { color: var(--neon); }
+
+  .subtitle {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* ====== NAV ====== */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 20px;
+    position: relative;
+    z-index: 10;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--fg-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nav-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--neon);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s;
+    z-index: -1;
+  }
+
+  [data-theme="dark"] .nav-btn:hover { color: #040e08; border-color: var(--neon); }
+  [data-theme="light"] .nav-btn:hover { color: #ffffff; border-color: var(--neon); }
+  .nav-btn:hover::before { transform: scaleX(1); }
+
+  [data-theme="dark"] .nav-btn.active { background: var(--neon); color: #040e08; border-color: var(--neon); font-weight: 700; }
+  [data-theme="light"] .nav-btn.active { background: var(--neon); color: #ffffff; border-color: var(--neon); font-weight: 700; }
+
+  /* ====== MAIN ====== */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .view { display: none; }
+  .view.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ====== SECTION TITLES ====== */
+  .section-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 32px;
+    letter-spacing: 3px;
+    color: var(--neon);
+    margin-bottom: 6px;
+  }
+
+  .section-desc {
+    font-size: 13px;
+    color: var(--fg-muted);
+    letter-spacing: 1px;
+    margin-bottom: 28px;
+  }
+
+  /* ====== CARDS ====== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    transition: background 0.3s, border-color 0.3s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--neon);
+  }
+
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 20px;
+  }
+
+  /* ====== FORMS ====== */
+  .form-group { margin-bottom: 16px; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"], input[type="number"], input[type="password"], select {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    padding: 10px 14px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, color 0.3s;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--neon);
+    background: var(--input-focus-bg);
+  }
+
+  select option { background: var(--select-opt-bg); color: var(--fg); }
+
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  [data-theme="dark"] .btn-primary { background: var(--neon); color: #040e08; }
+  [data-theme="light"] .btn-primary { background: var(--neon); color: #ffffff; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+  }
+  .btn-secondary:hover { border-color: var(--neon); color: var(--neon); }
+
+  .btn-danger { background: var(--red); color: white; }
+  .btn-danger:hover { filter: brightness(1.1); }
+
+  .btn + .btn { margin-left: 10px; }
+
+  /* ====== MATCH GRID ====== */
+  .matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .match-card {
+    background: var(--match-card-bg);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    transition: border-color 0.2s;
+  }
+
+  .match-card:hover { border-color: rgba(10,143,58,0.35); }
+  [data-theme="dark"] .match-card:hover { border-color: rgba(57,255,106,0.4); }
+
+  .match-teams {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .team-name.right { text-align: right; }
+
+  .vs-divider {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 16px;
+    color: var(--fg-muted);
+    letter-spacing: 2px;
+  }
+
+  .score-inputs {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .score-inputs input {
+    text-align: center;
+    padding: 8px 6px;
+    font-size: 18px;
+    font-family: 'Bebas Neue', cursive;
+    letter-spacing: 2px;
+  }
+
+  .score-sep {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    color: var(--fg-muted);
+    text-align: center;
+  }
+
+  .group-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--neon-dim);
+    margin-bottom: 14px;
+  }
+
+  /* ====== KNOCKOUT PICKS ====== */
+  .knockout-section { margin-bottom: 28px; }
+
+  .knockout-round-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(200,150,10,0.2);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+
+  .team-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+  }
+
+  .team-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--match-card-bg);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .team-check:hover { border-color: var(--neon); background: var(--knock-selected); }
+  .team-check.selected { border-color: var(--neon); background: var(--knock-selected); }
+  .team-check input[type="checkbox"] { display: none; }
+
+  .check-indicator {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  [data-theme="dark"] .team-check.selected .check-indicator { background: var(--neon); border-color: var(--neon); color: #040e08; }
+  [data-theme="light"] .team-check.selected .check-indicator { background: var(--neon); border-color: var(--neon); color: #ffffff; }
+
+  .check-team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .check-team-name.placeholder {
+    color: var(--fg-muted);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .team-name.placeholder-team {
+    color: var(--fg-muted);
+    font-style: italic;
+  }
+
+  /* ====== SPECIAL PICKS ====== */
+  .special-picks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 600px) { .special-picks { grid-template-columns: 1fr; } }
+
+  /* ====== LEADERBOARD ====== */
+  .leaderboard-table { width: 100%; border-collapse: collapse; }
+
+  .leaderboard-table th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .leaderboard-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    transition: background 0.15s;
+    opacity: 0.9;
+  }
+
+  .leaderboard-table tr:hover td { background: var(--row-hover); }
+
+  .rank-cell {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    color: var(--fg-muted);
+    width: 50px;
+  }
+
+  .rank-1 .rank-cell { color: var(--gold); }
+  .rank-2 .rank-cell { color: #a0a0a0; }
+  .rank-3 .rank-cell { color: #b87333; }
+
+  .participant-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .score-cell {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 24px;
+    color: var(--neon);
+    text-align: right;
+  }
+
+  /* ====== UPLOAD ====== */
+  .upload-area {
+    border: 2px dashed var(--border);
+    padding: 48px 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .upload-area:hover, .upload-area.dragover {
+    border-color: var(--neon);
+    background: var(--knock-selected);
+  }
+
+  .upload-area input { display: none; }
+  .upload-icon { font-size: 40px; margin-bottom: 12px; display: block; }
+
+  .upload-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .upload-subtext { font-size: 12px; color: var(--neon-dim); margin-top: 8px; }
+
+  /* ====== TOAST ====== */
+  #toast {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    padding: 14px 24px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 9999;
+  }
+
+  [data-theme="dark"] #toast { background: var(--neon); color: #040e08; }
+  [data-theme="light"] #toast { background: var(--neon); color: #ffffff; }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.error { background: var(--red) !important; color: white !important; }
+
+  /* ====== ADMIN RESULT INPUTS ====== */
+  .result-match {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-match:last-child { border-bottom: none; }
+
+  .result-team {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .result-score-inputs { display: flex; align-items: center; gap: 8px; }
+
+  .result-score-inputs input {
+    width: 52px;
+    text-align: center;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    padding: 6px;
+  }
+
+  .result-played { display: flex; align-items: center; gap: 6px; }
+
+  .result-played input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--neon);
+    cursor: pointer;
+  }
+
+  .result-played label { font-size: 10px; letter-spacing: 1px; color: var(--fg-muted); margin: 0; cursor: pointer; }
+
+  /* ====== TABS ====== */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+
+  .tab-btn:hover { color: var(--fg); }
+  .tab-btn.active { color: var(--neon); border-bottom-color: var(--neon); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ====== INFO STRIP ====== */
+  .info-strip { display: flex; gap: 20px; margin-bottom: 28px; flex-wrap: wrap; }
+
+  .info-pill {
+    background: var(--info-pill-bg);
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    transition: background 0.3s;
+  }
+
+  .info-pill span {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    color: var(--neon);
+    display: block;
+  }
+
+  .info-pill label { color: var(--fg-muted); margin: 0; display: block; }
+
+  /* ====== PARTICIPANT DETAIL ====== */
+  .participant-detail {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-top: 12px;
+    display: none;
+    transition: background 0.3s;
+  }
+
+  .participant-detail.open { display: block; animation: fadeIn 0.2s; }
+
+  .match-result-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .pts-badge {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 16px;
+    padding: 2px 8px;
+    background: var(--pts-bg);
+    color: var(--neon);
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .pts-badge.zero { background: var(--pts-zero-bg); color: var(--fg-muted); }
+
+  /* ====== CSV ====== */
+  .csv-example {
+    background: var(--csv-bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--neon-dim);
+    overflow-x: auto;
+    white-space: pre;
+    margin: 16px 0;
+  }
+
+  /* ====== EMPTY STATE ====== */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--fg-muted); }
+  .empty-state-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+  .empty-state-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .password-gate { max-width: 400px; margin: 60px auto; text-align: center; }
+
+  .admin-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+
+  /* ====== POINTS REF ====== */
+  .points-ref {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .points-ref-item {
+    background: var(--pts-ref-bg);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    font-size: 12px;
+    transition: background 0.3s;
+  }
+
+  .points-ref-item strong {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    color: var(--gold);
+    display: block;
+  }
+
+  .points-ref-item span { color: var(--fg-muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ====== ADMIN PW CHANGE ====== */
+  #admin-pw-change { display: none; }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- Theme toggle button -->
+<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
+  <span id="theme-icon">☀️</span>
+  <span id="theme-label">Licht</span>
+</button>
+
+<header>
+  <span class="trophy-icon">🏆</span>
+  <h1>WK <span>Fantasy</span> 2026</h1>
+  <p class="subtitle">Doe jouw voorspellingen &mdash; glorie wacht</p>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="showView('ranglijst')">🏅 Ranglijst</button>
+  <button class="nav-btn" onclick="showView('voorspel')">📝 Voorspellingen</button>
+  <button class="nav-btn" onclick="showView('upload')">📤 Upload CSV</button>
+  <button class="nav-btn" onclick="showView('admin')">⚙️ Admin</button>
+</nav>
+
+<main>
+
+  <!-- ======= RANGLIJST ======= -->
+  <div id="view-ranglijst" class="view active">
+    <div class="section-title">Ranglijst</div>
+    <p class="section-desc">Live standen — bijgewerkt zodra uitslagen bekend zijn</p>
+
+    <div class="info-strip" id="stats-strip"></div>
+
+    <div class="card">
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Deelnemer</th>
+            <th>Groepsfase</th>
+            <th>Knock-out</th>
+            <th style="text-align:right">Totaal</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+    </div>
+
+    <p style="font-size:12px;color:var(--fg-muted);text-align:center;margin-top:12px">Klik op een deelnemer voor een uitgebreide uitslagweergave</p>
+
+    <div id="participant-detail-panel" class="participant-detail"></div>
+  </div>
+
+  <!-- ======= VOORSPELLINGEN ======= -->
+  <div id="view-voorspel" class="view">
+    <div class="section-title">Jouw Voorspellingen</div>
+    <p class="section-desc">Vul al je picks in voor het hele toernooi</p>
+
+    <div class="card">
+      <div class="card-title">Jouw naam</div>
+      <div class="form-group">
+        <input type="text" id="predict-name" placeholder="Vul je naam in...">
+      </div>
+    </div>
+
+    <!-- Puntensysteem -->
+    <div class="card">
+      <div class="card-title">Puntensysteem</div>
+      <div class="points-ref">
+        <div class="points-ref-item"><strong>3</strong><span>Juiste uitslag (W/G/V)</span></div>
+        <div class="points-ref-item"><strong>6</strong><span>Exacte score</span></div>
+        <div class="points-ref-item"><strong>10</strong><span>Team naar R16</span></div>
+        <div class="points-ref-item"><strong>15</strong><span>Team naar KW</span></div>
+        <div class="points-ref-item"><strong>20</strong><span>Team naar HF</span></div>
+        <div class="points-ref-item"><strong>25</strong><span>Finalist correct</span></div>
+        <div class="points-ref-item"><strong>30</strong><span>Kampioen correct</span></div>
+        <div class="points-ref-item"><strong>25</strong><span>Topscorer correct</span></div>
+      </div>
+    </div>
+
+    <!-- Groepsfase -->
+    <div class="card">
+      <div class="card-title">Groepsfase Voorspellingen</div>
+      <div class="tabs" id="group-tabs"></div>
+      <div id="group-tab-contents"></div>
+    </div>
+
+    <!-- Knock-out -->
+    <div class="card">
+      <div class="card-title">Knock-outfase — Welke teams gaan door?</div>
+
+      <div class="knockout-section">
+        <div class="knockout-round-title">Ronde van 16 — Kies 16 teams (10 ptn per team)</div>
+        <div class="team-checkboxes" id="r16-picks"></div>
+        <p id="r16-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 16 geselecteerd</p>
+      </div>
+
+      <div class="knockout-section">
+        <div class="knockout-round-title">Kwartfinales — Kies 8 teams (15 ptn per team)</div>
+        <div class="team-checkboxes" id="qf-picks"></div>
+        <p id="qf-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 8 geselecteerd</p>
+      </div>
+
+      <div class="knockout-section">
+        <div class="knockout-round-title">Halve Finales — Kies 4 teams (20 ptn per team)</div>
+        <div class="team-checkboxes" id="sf-picks"></div>
+        <p id="sf-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 4 geselecteerd</p>
+      </div>
+
+      <div class="knockout-section">
+        <div class="knockout-round-title">Finale — Kies 2 teams (25 ptn per team)</div>
+        <div class="team-checkboxes" id="final-picks"></div>
+        <p id="final-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 2 geselecteerd</p>
+      </div>
+    </div>
+
+    <!-- Speciale picks -->
+    <div class="card">
+      <div class="card-title">Speciale Picks</div>
+      <div class="special-picks">
+        <div class="form-group">
+          <label>🏆 Kampioen (30 ptn)</label>
+          <select id="pick-champion">
+            <option value="">— Selecteer land —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>⚽ Topscorer (25 ptn)</label>
+          <input type="text" id="pick-topscorer" placeholder="bijv. Mbappé">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="submitPredictions()">✓ Verstuur Mijn Voorspellingen</button>
+  </div>
+
+  <!-- ======= UPLOAD ======= -->
+  <div id="view-upload" class="view">
+    <div class="section-title">Upload CSV</div>
+    <p class="section-desc">Upload een ingevuld voorspellingsformulier</p>
+
+    <div class="card">
+      <div class="card-title">Download Sjabloon</div>
+      <p style="font-size:13px;color:var(--fg-muted);margin-bottom:16px">Download het CSV-sjabloon, vul het in en upload het hieronder.</p>
+      <button class="btn btn-secondary" onclick="downloadTemplate()">⬇ Download CSV-sjabloon</button>
+
+      <div style="margin-top:20px">
+        <p style="font-size:12px;color:var(--fg-muted);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase">CSV-formaat (voorbeeld):</p>
+        <div class="csv-example" id="csv-example-preview"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Upload Jouw Voorspellingen</div>
+      <div class="upload-area" id="upload-area" onclick="document.getElementById('csv-input').click()">
+        <input type="file" id="csv-input" accept=".csv" onchange="handleCSVUpload(event)">
+        <span class="upload-icon">📂</span>
+        <p class="upload-text">Klik of sleep je CSV hierheen</p>
+        <p class="upload-subtext">Alleen .csv bestanden</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= ADMIN ======= -->
+  <div id="view-admin" class="view">
+    <div id="admin-gate">
+      <div class="password-gate">
+        <div class="section-title">Admin Toegang</div>
+        <p style="color:var(--fg-muted);font-size:13px;margin-bottom:24px">Voer het beheerderswachtwoord in om uitslagen te beheren</p>
+        <div class="form-group">
+          <input type="password" id="admin-password" placeholder="Wachtwoord..." onkeydown="if(event.key==='Enter')checkAdminPassword()">
+        </div>
+        <button class="btn btn-primary" onclick="checkAdminPassword()">Toegang Krijgen</button>
+        <p style="font-size:11px;color:var(--fg-muted);margin-top:12px">Standaardwachtwoord: <strong style="color:var(--neon)">admin2026</strong> — wijzigbaar in instellingen</p>
+      </div>
+    </div>
+
+    <div id="admin-panel" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="section-title">Beheerderspaneel</div>
+          <p class="section-desc">Voer wedstrijduitslagen in om de ranglijst bij te werken</p>
+        </div>
+        <button class="btn btn-secondary" onclick="lockAdmin()">🔒 Vergrendelen</button>
+      </div>
+
+      <div class="admin-actions">
+        <button class="btn btn-primary" onclick="saveResults()">💾 Alles Opslaan</button>
+        <button class="btn btn-secondary" onclick="exportData()">📤 Exporteer Data</button>
+        <button class="btn btn-danger" onclick="clearAllParticipants()">🗑 Deelnemers Wissen</button>
+        <button class="btn btn-secondary" onclick="showAdminPasswordChange()">🔑 Wachtwoord Wijzigen</button>
+      </div>
+
+      <div id="admin-pw-change" class="card">
+        <div class="card-title">Wachtwoord Wijzigen</div>
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div class="form-group" style="flex:1;min-width:200px;margin:0">
+            <label>Nieuw wachtwoord</label>
+            <input type="password" id="new-pw" placeholder="Nieuw wachtwoord...">
+          </div>
+          <button class="btn btn-primary" onclick="changePassword()">Opslaan</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('admin-pw-change').style.display='none'">Annuleren</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Wedstrijduitslagen — Groepsfase</div>
+        <div class="tabs" id="admin-group-tabs"></div>
+        <div id="admin-group-contents"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Knock-out Uitslagen</div>
+
+        <div style="margin-bottom:20px">
+          <p class="knockout-round-title">Werkelijke teams in R16</p>
+          <div class="team-checkboxes" id="admin-r16"></div>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <p class="knockout-round-title">Werkelijke KW-teams</p>
+          <div class="team-checkboxes" id="admin-qf"></div>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <p class="knockout-round-title">Werkelijke HF-teams</p>
+          <div class="team-checkboxes" id="admin-sf"></div>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <p class="knockout-round-title">Werkelijke Finalisten</p>
+          <div class="team-checkboxes" id="admin-final"></div>
+        </div>
+
+        <div class="special-picks">
+          <div class="form-group">
+            <label>🏆 Werkelijke Kampioen</label>
+            <select id="admin-champion">
+              <option value="">— Nog niet beslist —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>⚽ Werkelijke Topscorer</label>
+            <input type="text" id="admin-topscorer" placeholder="bijv. Mbappé">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// =============================================
+// DATA — WK 2026 Groepen & Wedstrijden (officieel)
+// Datums zijn lokale speeldatums (Noord-Amerika)
+// Placeholder = team nog niet gekwalificeerd
+// =============================================
+const GROUPS = {
+  A: {
+    teams: ['Mexico','Zuid-Afrika','Zuid-Korea','UEFA Play-off D*'],
+    matches: [
+      ['Mexico','Zuid-Afrika','11 jun'],
+      ['Zuid-Korea','UEFA Play-off D*','11 jun'],
+      ['Mexico','Zuid-Korea','18 jun'],
+      ['UEFA Play-off D*','Zuid-Afrika','18 jun'],
+      ['UEFA Play-off D*','Mexico','24 jun'],
+      ['Zuid-Afrika','Zuid-Korea','24 jun'],
+    ]
+  },
+  B: {
+    teams: ['Canada','UEFA Play-off A*','Qatar','Zwitserland'],
+    matches: [
+      ['Canada','UEFA Play-off A*','12 jun'],
+      ['Qatar','Zwitserland','13 jun'],
+      ['Zwitserland','UEFA Play-off A*','18 jun'],
+      ['Canada','Qatar','18 jun'],
+      ['Zwitserland','Canada','24 jun'],
+      ['UEFA Play-off A*','Qatar','24 jun'],
+    ]
+  },
+  C: {
+    teams: ['Brazilië','Marokko','Haïti','Schotland'],
+    matches: [
+      ['Brazilië','Marokko','13 jun'],
+      ['Haïti','Schotland','13 jun'],
+      ['Schotland','Marokko','19 jun'],
+      ['Brazilië','Haïti','19 jun'],
+      ['Schotland','Brazilië','24 jun'],
+      ['Marokko','Haïti','24 jun'],
+    ]
+  },
+  D: {
+    teams: ['VS','Paraguay','Australië','UEFA Play-off C*'],
+    matches: [
+      ['VS','Paraguay','12 jun'],
+      ['Australië','UEFA Play-off C*','13 jun'],
+      ['VS','Australië','19 jun'],
+      ['UEFA Play-off C*','Paraguay','19 jun'],
+      ['UEFA Play-off C*','VS','25 jun'],
+      ['Paraguay','Australië','25 jun'],
+    ]
+  },
+  E: {
+    teams: ['Duitsland','Curaçao','Ivoorkust','Ecuador'],
+    matches: [
+      ['Duitsland','Curaçao','14 jun'],
+      ['Ivoorkust','Ecuador','15 jun'],
+      ['Duitsland','Ivoorkust','20 jun'],
+      ['Ecuador','Curaçao','20 jun'],
+      ['Ecuador','Duitsland','25 jun'],
+      ['Curaçao','Ivoorkust','25 jun'],
+    ]
+  },
+  F: {
+    teams: ['Nederland','Japan','UEFA Play-off B*','Tunesië'],
+    matches: [
+      ['Nederland','Japan','14 jun'],
+      ['UEFA Play-off B*','Tunesië','14 jun'],
+      ['Nederland','UEFA Play-off B*','20 jun'],
+      ['Tunesië','Japan','20 jun'],
+      ['Tunesië','Nederland','25 jun'],
+      ['Japan','UEFA Play-off B*','25 jun'],
+    ]
+  },
+  G: {
+    teams: ['België','Egypte','Iran','Nieuw-Zeeland'],
+    matches: [
+      ['Iran','Nieuw-Zeeland','15 jun'],
+      ['België','Egypte','16 jun'],
+      ['België','Iran','21 jun'],
+      ['Egypte','Nieuw-Zeeland','21 jun'],
+      ['Egypte','Iran','26 jun'],
+      ['Nieuw-Zeeland','België','26 jun'],
+    ]
+  },
+  H: {
+    teams: ['Spanje','Saudi-Arabië','Kaapverdië','Uruguay'],
+    matches: [
+      ['Spanje','Kaapverdië','15 jun'],
+      ['Saudi-Arabië','Uruguay','15 jun'],
+      ['Spanje','Saudi-Arabië','21 jun'],
+      ['Uruguay','Kaapverdië','21 jun'],
+      ['Uruguay','Spanje','26 jun'],
+      ['Kaapverdië','Saudi-Arabië','26 jun'],
+    ]
+  },
+  I: {
+    teams: ['Frankrijk','Senegal','Intercont. Play-off 2*','Noorwegen'],
+    matches: [
+      ['Intercont. Play-off 2*','Noorwegen','16 jun'],
+      ['Frankrijk','Senegal','17 jun'],
+      ['Frankrijk','Noorwegen','22 jun'],
+      ['Senegal','Intercont. Play-off 2*','22 jun'],
+      ['Noorwegen','Senegal','27 jun'],
+      ['Intercont. Play-off 2*','Frankrijk','27 jun'],
+    ]
+  },
+  J: {
+    teams: ['Argentinië','Algerije','Oostenrijk','Jordanië'],
+    matches: [
+      ['Argentinië','Algerije','16 jun'],
+      ['Oostenrijk','Jordanië','17 jun'],
+      ['Argentinië','Oostenrijk','22 jun'],
+      ['Jordanië','Algerije','22 jun'],
+      ['Jordanië','Argentinië','27 jun'],
+      ['Algerije','Oostenrijk','27 jun'],
+    ]
+  },
+  K: {
+    teams: ['Portugal','Intercont. Play-off 1*','Oezbekistan','Colombia'],
+    matches: [
+      ['Oezbekistan','Colombia','17 jun'],
+      ['Portugal','Intercont. Play-off 1*','18 jun'],
+      ['Portugal','Oezbekistan','23 jun'],
+      ['Colombia','Intercont. Play-off 1*','23 jun'],
+      ['Colombia','Portugal','27 jun'],
+      ['Intercont. Play-off 1*','Oezbekistan','27 jun'],
+    ]
+  },
+  L: {
+    teams: ['Engeland','Kroatië','Ghana','Panama'],
+    matches: [
+      ['Engeland','Kroatië','17 jun'],
+      ['Ghana','Panama','18 jun'],
+      ['Engeland','Ghana','23 jun'],
+      ['Panama','Kroatië','23 jun'],
+      ['Panama','Engeland','27 jun'],
+      ['Kroatië','Ghana','27 jun'],
+    ]
+  },
+};
+
+const ALL_TEAMS = Object.values(GROUPS).flatMap(g => g.teams).sort((a,b) => a.localeCompare(b, 'nl'));
+
+const POINTS = { correct_result: 3, exact_score: 6, r16: 10, qf: 15, sf: 20, final: 25, champion: 30, top_scorer: 25 };
+const LIMITS = { r16: 16, qf: 8, sf: 4, final: 2 };
+
+// =============================================
+// STATE
+// =============================================
+let participants = [];
+let results = { matches: {}, r16: [], qf: [], sf: [], final: [], champion: '', top_scorer: '' };
+let adminUnlocked = false;
+
+function matchKey(g, a, b) { return `${g}_${a}_${b}`; }
+
+function loadState() {
+  try {
+    const p = localStorage.getItem('wkf_nl_participants');
+    const r = localStorage.getItem('wkf_nl_results');
+    const theme = localStorage.getItem('wkf_nl_theme');
+    if (p) participants = JSON.parse(p);
+    if (r) results = { ...results, ...JSON.parse(r) };
+    if (theme) applyTheme(theme);
+  } catch(e) {}
+}
+
+function saveState() {
+  localStorage.setItem('wkf_nl_participants', JSON.stringify(participants));
+  localStorage.setItem('wkf_nl_results', JSON.stringify(results));
+}
+
+function getAdminPassword() {
+  return localStorage.getItem('wkf_nl_admin_pw') || 'admin2026';
+}
+
+// =============================================
+// THEME TOGGLE
+// =============================================
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const isDark = theme === 'dark';
+  document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('theme-label').textContent = isDark ? 'Licht' : 'Donker';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem('wkf_nl_theme', next);
+}
+
+// =============================================
+// SCORING
+// =============================================
+function scoreParticipant(p) {
+  let groupPts = 0, knockoutPts = 0, breakdown = [];
+
+  for (const [group, gdata] of Object.entries(GROUPS)) {
+    for (const [a, b] of gdata.matches) {
+      const key = matchKey(group, a, b);
+      const predicted = p.scores?.[key];
+      const actual = results.matches?.[key];
+      if (!predicted || !actual || !actual.played) continue;
+
+      const pA = parseInt(predicted.a), pB = parseInt(predicted.b);
+      const rA = parseInt(actual.a), rB = parseInt(actual.b);
+      if (isNaN(pA) || isNaN(pB) || isNaN(rA) || isNaN(rB)) continue;
+
+      if (pA === rA && pB === rB) {
+        groupPts += POINTS.exact_score;
+        breakdown.push({ match: `${a} vs ${b}`, predicted: `${pA}-${pB}`, actual: `${rA}-${rB}`, pts: POINTS.exact_score, reason: 'Exacte score' });
+      } else if (Math.sign(pA - pB) === Math.sign(rA - rB)) {
+        groupPts += POINTS.correct_result;
+        breakdown.push({ match: `${a} vs ${b}`, predicted: `${pA}-${pB}`, actual: `${rA}-${rB}`, pts: POINTS.correct_result, reason: 'Juiste uitslag' });
+      } else {
+        breakdown.push({ match: `${a} vs ${b}`, predicted: `${pA}-${pB}`, actual: `${rA}-${rB}`, pts: 0, reason: 'Fout' });
+      }
+    }
+  }
+
+  const rounds = [['r16', POINTS.r16], ['qf', POINTS.qf], ['sf', POINTS.sf], ['final', POINTS.final]];
+  for (const [round, pts] of rounds) {
+    const actual = new Set(results[round] || []);
+    const picked = p.knockout?.[round] || [];
+    for (const team of picked) {
+      if (actual.has(team)) knockoutPts += pts;
+    }
+  }
+
+  if (p.champion && results.champion && p.champion.toLowerCase() === results.champion.toLowerCase())
+    knockoutPts += POINTS.champion;
+
+  if (p.top_scorer && results.top_scorer && p.top_scorer.toLowerCase() === results.top_scorer.toLowerCase())
+    knockoutPts += POINTS.top_scorer;
+
+  return { groupPts, knockoutPts, total: groupPts + knockoutPts, breakdown };
+}
+
+// =============================================
+// RANGLIJST
+// =============================================
+function renderLeaderboard() {
+  const scored = participants.map(p => ({ ...p, ...scoreParticipant(p) }));
+  scored.sort((a, b) => b.total - a.total);
+
+  const body = document.getElementById('leaderboard-body');
+
+  if (scored.length === 0) {
+    body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><span class="empty-state-icon">📋</span><div class="empty-state-text">Nog geen voorspellingen</div><p style="font-size:12px;color:var(--fg-muted)">Deelnemers kunnen via het formulier of CSV uploaden</p></div></td></tr>`;
+  } else {
+    body.innerHTML = scored.map((p, i) => `
+      <tr class="rank-${i+1}" style="cursor:pointer" onclick="toggleParticipantDetail('${p.name.replace(/'/g,"\\'")}')">
+        <td class="rank-cell">${i+1}</td>
+        <td><div class="participant-name">${p.name}</div></td>
+        <td style="color:var(--fg-muted)">${p.groupPts}</td>
+        <td style="color:var(--fg-muted)">${p.knockoutPts}</td>
+        <td class="score-cell">${p.total}</td>
+      </tr>
+    `).join('');
+  }
+
+  const totalMatches = Object.values(GROUPS).reduce((s, g) => s + g.matches.length, 0);
+  const played = Object.values(results.matches || {}).filter(m => m.played).length;
+  document.getElementById('stats-strip').innerHTML = `
+    <div class="info-pill"><span>${scored.length}</span><label>Deelnemers</label></div>
+    <div class="info-pill"><span>${played}/${totalMatches}</span><label>Gespeelde wedstrijden</label></div>
+    <div class="info-pill"><span>${scored[0]?.name || '—'}</span><label>Huidige leider</label></div>
+    <div class="info-pill"><span>${scored[0]?.total || 0}</span><label>Topscore</label></div>
+  `;
+}
+
+function toggleParticipantDetail(name) {
+  const p = participants.find(x => x.name === name);
+  if (!p) return;
+  const panel = document.getElementById('participant-detail-panel');
+  const scored = scoreParticipant(p);
+
+  const matchRows = scored.breakdown.map(b => `
+    <div class="match-result-row">
+      <span style="color:var(--fg-muted);font-size:12px">${b.match}</span>
+      <span style="font-size:11px;color:var(--fg-muted)">Voorsp: <strong style="color:var(--fg)">${b.predicted}</strong></span>
+      <span style="font-size:11px;color:var(--fg-muted)">Echt: <strong style="color:var(--fg)">${b.actual}</strong></span>
+      <span style="font-size:11px;color:var(--fg-muted)">${b.reason}</span>
+      <span class="pts-badge ${b.pts === 0 ? 'zero' : ''}">${b.pts}</span>
+    </div>
+  `).join('');
+
+  const roundLabels = { r16: 'R16', qf: 'KW', sf: 'HF', final: 'Finale' };
+  const knockRows = Object.entries(roundLabels).map(([k, label]) => {
+    const picked = p.knockout?.[k] || [];
+    const actual = new Set(results[k] || []);
+    return picked.map(team => `
+      <div class="match-result-row">
+        <span style="color:var(--fg-muted);font-size:12px">${label}: ${team}</span>
+        <span></span><span></span>
+        <span style="font-size:11px;color:${actual.has(team) ? 'var(--neon)' : 'var(--fg-muted)'}">${actual.has(team) ? '✓ Correct' : actual.size > 0 ? '✗ Fout' : 'Afwachten'}</span>
+        <span class="pts-badge ${actual.has(team) ? '' : 'zero'}">${actual.has(team) ? POINTS[k] : 0}</span>
+      </div>
+    `).join('');
+  }).join('');
+
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="card-title" style="margin:0">Voorspellingen van ${p.name}</div>
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:11px" onclick="document.getElementById('participant-detail-panel').classList.remove('open')">Sluiten</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--detail-score-bg);padding:12px;border:1px solid var(--border)">
+        <strong style="font-family:'Bebas Neue';font-size:28px;color:var(--neon)">${scored.total}</strong>
+        <div style="font-size:11px;color:var(--fg-muted);letter-spacing:1px;text-transform:uppercase">Totaal punten</div>
+      </div>
+      <div style="background:var(--detail-meta-bg);padding:12px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--fg-muted)">🏆 Kampioen: <strong style="color:var(--fg)">${p.champion || '—'}</strong></div>
+        <div style="font-size:12px;color:var(--fg-muted);margin-top:4px">⚽ Topscorer: <strong style="color:var(--fg)">${p.top_scorer || '—'}</strong></div>
+      </div>
+    </div>
+    ${matchRows ? `<div style="margin-bottom:12px">${matchRows}</div>` : ''}
+    ${knockRows}
+  `;
+  panel.classList.add('open');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// =============================================
+// VOORSPELFORMULIER
+// =============================================
+function buildPredictForm() {
+  const tabsEl = document.getElementById('group-tabs');
+  const contentsEl = document.getElementById('group-tab-contents');
+  tabsEl.innerHTML = '';
+  contentsEl.innerHTML = '';
+
+  Object.entries(GROUPS).forEach(([group, gdata], idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+    btn.textContent = `Groep ${group}`;
+    btn.onclick = () => switchGroupTab(group, 'pred');
+    tabsEl.appendChild(btn);
+
+    const div = document.createElement('div');
+    div.id = `pred-group-${group}`;
+    div.className = 'tab-content' + (idx === 0 ? ' active' : '');
+    div.innerHTML = `
+      <div class="matches-grid">
+        ${gdata.matches.map(([a, b, date]) => {
+          const key = matchKey(group, a, b);
+          const aIsPlaceholder = a.endsWith('*');
+          const bIsPlaceholder = b.endsWith('*');
+          return `
+            <div class="match-card">
+              <div class="group-label">Groep ${group} &nbsp;·&nbsp; ${date}</div>
+              <div class="match-teams">
+                <div class="team-name${aIsPlaceholder ? ' placeholder-team' : ''}">${a.replace('*','')}</div>
+                <div class="vs-divider">VS</div>
+                <div class="team-name right${bIsPlaceholder ? ' placeholder-team' : ''}">${b.replace('*','')}</div>
+              </div>
+              <div class="score-inputs">
+                <input type="number" min="0" max="20" id="pred_${key}_a" placeholder="0">
+                <div class="score-sep">—</div>
+                <input type="number" min="0" max="20" id="pred_${key}_b" placeholder="0">
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    contentsEl.appendChild(div);
+  });
+
+  buildKnockoutCheckboxes('r16-picks', 'r16', LIMITS.r16);
+  buildKnockoutCheckboxes('qf-picks', 'qf', LIMITS.qf);
+  buildKnockoutCheckboxes('sf-picks', 'sf', LIMITS.sf);
+  buildKnockoutCheckboxes('final-picks', 'final', LIMITS.final);
+
+  const sel = document.getElementById('pick-champion');
+  sel.innerHTML = '<option value="">— Selecteer land —</option>' + ALL_TEAMS.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function buildKnockoutCheckboxes(containerId, round, limit) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = ALL_TEAMS.map(team => {
+    const isPlaceholder = team.endsWith('*');
+    return `
+    <label class="team-check" id="kc-${round}-${team.replace(/[\s\-\'\*\.\/]/g,'_')}" onclick="toggleKnockoutPick('${round}', '${team.replace(/'/g,"\\'")}', ${limit})">
+      <input type="checkbox" value="${team}">
+      <div class="check-indicator">✓</div>
+      <span class="check-team-name${isPlaceholder ? ' placeholder' : ''}">${team.replace('*','')}</span>
+    </label>`;
+  }).join('');
+}
+
+function toggleKnockoutPick(round, team, limit) {
+  const id = `kc-${round}-${team.replace(/[\s\-\'\*\.\/]/g,'_')}`;
+  const el = document.getElementById(id);
+  const selected = el.classList.contains('selected');
+  if (!selected) {
+    const currentCount = document.querySelectorAll(`#${round}-picks .team-check.selected`).length;
+    if (currentCount >= limit) { showToast(`Maximaal ${limit} teams voor deze ronde`, true); return; }
+  }
+  el.classList.toggle('selected');
+  el.querySelector('input').checked = !selected;
+  updateKnockoutCount(round, limit);
+}
+
+function updateKnockoutCount(round, limit) {
+  const count = document.querySelectorAll(`#${round}-picks .team-check.selected`).length;
+  const el = document.getElementById(`${round}-count`);
+  if (el) el.textContent = `${count} / ${limit} geselecteerd`;
+}
+
+function switchGroupTab(group, prefix) {
+  const allTabs = document.querySelectorAll(prefix === 'pred' ? '#group-tabs .tab-btn' : '#admin-group-tabs .tab-btn');
+  const allContents = document.querySelectorAll(prefix === 'pred' ? '#group-tab-contents .tab-content' : '#admin-group-contents .tab-content');
+  allTabs.forEach(b => b.classList.remove('active'));
+  allContents.forEach(c => c.classList.remove('active'));
+  const tabEl = [...allTabs].find(b => b.textContent === `Groep ${group}`);
+  const contentEl = document.getElementById(`${prefix}-group-${group}`);
+  if (tabEl) tabEl.classList.add('active');
+  if (contentEl) contentEl.classList.add('active');
+}
+
+function submitPredictions() {
+  const name = document.getElementById('predict-name').value.trim();
+  if (!name) { showToast('Vul eerst je naam in', true); return; }
+
+  if (participants.find(p => p.name.toLowerCase() === name.toLowerCase())) {
+    if (!confirm(`Er bestaat al een voorspelling voor "${name}". Overschrijven?`)) return;
+    participants = participants.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+  }
+
+  const scores = {};
+  for (const [group, gdata] of Object.entries(GROUPS)) {
+    for (const [a, b] of gdata.matches) {
+      const key = matchKey(group, a, b);
+      const va = document.getElementById(`pred_${key}_a`)?.value;
+      const vb = document.getElementById(`pred_${key}_b`)?.value;
+      if (va !== '' && vb !== '') scores[key] = { a: va, b: vb };
+    }
+  }
+
+  const knockout = {
+    r16: [...document.querySelectorAll('#r16-picks .team-check.selected')].map(el => el.querySelector('input').value),
+    qf: [...document.querySelectorAll('#qf-picks .team-check.selected')].map(el => el.querySelector('input').value),
+    sf: [...document.querySelectorAll('#sf-picks .team-check.selected')].map(el => el.querySelector('input').value),
+    final: [...document.querySelectorAll('#final-picks .team-check.selected')].map(el => el.querySelector('input').value),
+  };
+
+  const champion = document.getElementById('pick-champion').value;
+  const top_scorer = document.getElementById('pick-topscorer').value.trim();
+
+  participants.push({ name, scores, knockout, champion, top_scorer, submitted: new Date().toISOString() });
+  saveState();
+  showToast('Voorspellingen opgeslagen! Veel succes 🎉');
+  showView('ranglijst');
+}
+
+// =============================================
+// CSV UPLOAD
+// =============================================
+function buildCSVExample() {
+  const lines = ['naam,type,sleutel,waarde_a,waarde_b'];
+  const g = Object.entries(GROUPS)[0];
+  lines.push(`Jan Jansen,wedstrijd,${g[0]}_${g[1].matches[0][0]}_${g[1].matches[0][1]},2,1`);
+  lines.push(`Jan Jansen,r16,${g[1].teams[0]},`);
+  lines.push(`Jan Jansen,kampioen,${g[1].teams[0]},`);
+  lines.push(`Jan Jansen,topscorer,Mbappé,`);
+  document.getElementById('csv-example-preview').textContent = lines.join('\n');
+}
+
+function downloadTemplate() {
+  let csv = 'naam,type,sleutel,waarde_a,waarde_b\n';
+  csv += '# Vul je naam in de kolom "naam" voor elke rij\n';
+  csv += '# Voor groepswedstrijden: type=wedstrijd, sleutel=GroepX_TeamA_TeamB, waarde_a=score, waarde_b=score\n';
+  csv += '# Voor knock-out: type=r16/kw/hf/finale, sleutel=Teamnaam\n';
+  csv += '# Voor special: type=kampioen of topscorer, sleutel=waarde\n\n';
+
+  for (const [group, gdata] of Object.entries(GROUPS)) {
+    for (const [a, b] of gdata.matches) {
+      csv += `JouwNaam,wedstrijd,${matchKey(group,a,b)},0,0\n`;
+    }
+  }
+  for (const team of ALL_TEAMS) {
+    csv += `JouwNaam,r16,${team},,\n`;
+  }
+  csv += `JouwNaam,kampioen,Landnaam,,\n`;
+  csv += `JouwNaam,topscorer,Spelernaam,,\n`;
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'wk_fantasy_sjabloon.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function handleCSVUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const lines = e.target.result.split('\n').filter(l => l.trim() && !l.startsWith('#'));
+      const byName = {};
+
+      for (const line of lines.slice(1)) {
+        const cols = line.split(',').map(c => c.trim());
+        if (cols.length < 3) continue;
+        const [name, type, key] = cols;
+        if (!name || !type || !key) continue;
+        if (!byName[name]) byName[name] = { name, scores: {}, knockout: { r16:[], qf:[], sf:[], final:[] }, champion:'', top_scorer:'' };
+
+        const p = byName[name];
+        if (type === 'wedstrijd') {
+          p.scores[key] = { a: cols[3] || '0', b: cols[4] || '0' };
+        } else if (['r16','kw','hf','finale'].includes(type)) {
+          const roundMap = { r16:'r16', kw:'qf', hf:'sf', finale:'final' };
+          const r = roundMap[type];
+          if (key && !p.knockout[r].includes(key)) p.knockout[r].push(key);
+        } else if (type === 'kampioen') {
+          p.champion = key;
+        } else if (type === 'topscorer') {
+          p.top_scorer = key;
+        }
+      }
+
+      let added = 0;
+      for (const p of Object.values(byName)) {
+        participants = participants.filter(x => x.name.toLowerCase() !== p.name.toLowerCase());
+        participants.push({ ...p, submitted: new Date().toISOString() });
+        added++;
+      }
+
+      saveState();
+      showToast(`${added} deelnemer(s) geïmporteerd ✓`);
+      showView('ranglijst');
+    } catch(err) {
+      showToast('Fout bij verwerken CSV — controleer het formaat', true);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// =============================================
+// ADMIN
+// =============================================
+function checkAdminPassword() {
+  const pw = document.getElementById('admin-password').value;
+  if (pw === getAdminPassword()) {
+    adminUnlocked = true;
+    document.getElementById('admin-gate').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    buildAdminPanel();
+  } else {
+    showToast('Onjuist wachtwoord', true);
+  }
+}
+
+function lockAdmin() {
+  adminUnlocked = false;
+  document.getElementById('admin-gate').style.display = 'block';
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-password').value = '';
+}
+
+function buildAdminPanel() {
+  const tabsEl = document.getElementById('admin-group-tabs');
+  const contentsEl = document.getElementById('admin-group-contents');
+  tabsEl.innerHTML = '';
+  contentsEl.innerHTML = '';
+
+  Object.entries(GROUPS).forEach(([group, gdata], idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+    btn.textContent = `Groep ${group}`;
+    btn.onclick = () => switchGroupTab(group, 'admin');
+    tabsEl.appendChild(btn);
+
+    const div = document.createElement('div');
+    div.id = `admin-group-${group}`;
+    div.className = 'tab-content' + (idx === 0 ? ' active' : '');
+    div.innerHTML = gdata.matches.map(([a, b, date]) => {
+      const key = matchKey(group, a, b);
+      const saved = results.matches?.[key] || {};
+      const aLabel = a.replace('*','') + (a.endsWith('*') ? ' (play-off)' : '');
+      const bLabel = b.replace('*','') + (b.endsWith('*') ? ' (play-off)' : '');
+      return `
+        <div class="result-match">
+          <div class="result-team">${aLabel}<div style="font-size:10px;color:var(--fg-muted);letter-spacing:1px;font-weight:400">${date}</div></div>
+          <div class="result-score-inputs">
+            <input type="number" min="0" max="20" id="res_${key}_a" value="${saved.a ?? ''}" placeholder="0">
+            <span style="font-family:'Bebas Neue';font-size:20px;color:var(--fg-muted)">—</span>
+            <input type="number" min="0" max="20" id="res_${key}_b" value="${saved.b ?? ''}" placeholder="0">
+          </div>
+          <div class="result-team" style="text-align:right">${bLabel}</div>
+          <div class="result-played">
+            <input type="checkbox" id="played_${key}" ${saved.played ? 'checked' : ''}>
+            <label for="played_${key}">Gespeeld</label>
+          </div>
+        </div>
+      `;
+    }).join('');
+    contentsEl.appendChild(div);
+  });
+
+  buildAdminKnockoutCheckboxes('admin-r16', 'r16', LIMITS.r16);
+  buildAdminKnockoutCheckboxes('admin-qf', 'qf', LIMITS.qf);
+  buildAdminKnockoutCheckboxes('admin-sf', 'sf', LIMITS.sf);
+  buildAdminKnockoutCheckboxes('admin-final', 'final', LIMITS.final);
+
+  const sel = document.getElementById('admin-champion');
+  sel.innerHTML = '<option value="">— Nog niet beslist —</option>' + ALL_TEAMS.map(t => `<option value="${t}" ${results.champion === t ? 'selected' : ''}>${t}</option>`).join('');
+  document.getElementById('admin-topscorer').value = results.top_scorer || '';
+}
+
+function buildAdminKnockoutCheckboxes(containerId, round, limit) {
+  const el = document.getElementById(containerId);
+  const saved = new Set(results[round] || []);
+  el.innerHTML = ALL_TEAMS.map(team => {
+    const isPlaceholder = team.endsWith('*');
+    return `
+    <label class="team-check ${saved.has(team) ? 'selected' : ''}" id="adk-${round}-${team.replace(/[\s\-\'\*\.\/]/g,'_')}" onclick="toggleAdminKnock('${round}', '${team.replace(/'/g,"\\'")}', ${limit})">
+      <input type="checkbox" value="${team}" ${saved.has(team) ? 'checked' : ''}>
+      <div class="check-indicator">✓</div>
+      <span class="check-team-name${isPlaceholder ? ' placeholder' : ''}">${team.replace('*','')}</span>
+    </label>`;
+  }).join('');
+}
+
+function toggleAdminKnock(round, team, limit) {
+  const id = `adk-${round}-${team.replace(/[\s\-\'\*\.\/]/g,'_')}`;
+  const el = document.getElementById(id);
+  const selected = el.classList.contains('selected');
+  if (!selected) {
+    const currentCount = document.querySelectorAll(`#admin-${round} .team-check.selected`).length;
+    if (currentCount >= limit) { showToast(`Maximaal ${limit} voor deze ronde`, true); return; }
+  }
+  el.classList.toggle('selected');
+  el.querySelector('input').checked = !selected;
+}
+
+function saveResults() {
+  for (const [group, gdata] of Object.entries(GROUPS)) {
+    for (const [a, b] of gdata.matches) {
+      const key = matchKey(group, a, b);
+      const va = document.getElementById(`res_${key}_a`)?.value;
+      const vb = document.getElementById(`res_${key}_b`)?.value;
+      const played = document.getElementById(`played_${key}`)?.checked;
+      results.matches[key] = { a: va, b: vb, played };
+    }
+  }
+
+  const rounds = ['r16','qf','sf','final'];
+  for (const round of rounds) {
+    results[round] = [...document.querySelectorAll(`#admin-${round} .team-check.selected`)].map(el => el.querySelector('input').value);
+  }
+
+  results.champion = document.getElementById('admin-champion').value;
+  results.top_scorer = document.getElementById('admin-topscorer').value.trim();
+
+  saveState();
+  renderLeaderboard();
+  showToast('Uitslagen opgeslagen & ranglijst bijgewerkt ✓');
+}
+
+function clearAllParticipants() {
+  if (!confirm('Alle voorspellingen verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
+  participants = [];
+  saveState();
+  renderLeaderboard();
+  showToast('Alle deelnemers verwijderd');
+}
+
+function exportData() {
+  const data = { participants, results, exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'wk_fantasy_backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showAdminPasswordChange() {
+  document.getElementById('admin-pw-change').style.display = 'block';
+}
+
+function changePassword() {
+  const pw = document.getElementById('new-pw').value;
+  if (!pw) { showToast('Voer een wachtwoord in', true); return; }
+  localStorage.setItem('wkf_nl_admin_pw', pw);
+  document.getElementById('admin-pw-change').style.display = 'none';
+  showToast('Wachtwoord bijgewerkt ✓');
+}
+
+// =============================================
+// UI HULPFUNCTIES
+// =============================================
+const viewMap = { ranglijst: 0, voorspel: 1, upload: 2, admin: 3 };
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`view-${id}`).classList.add('active');
+  if (viewMap[id] !== undefined) document.querySelectorAll('.nav-btn')[viewMap[id]].classList.add('active');
+  if (id === 'ranglijst') renderLeaderboard();
+}
+
+function showToast(msg, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (isError ? ' error' : '');
+  setTimeout(() => el.classList.remove('show', 'error'), 3200);
+}
+
+// Drag & drop upload
+const uploadArea = document.getElementById('upload-area');
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+uploadArea.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) handleCSVUpload({ target: { files: [file] } });
+});
+
+// =============================================
+// INIT
+// =============================================
+loadState();
+buildPredictForm();
+buildCSVExample();
+renderLeaderboard();
+</script>
+</body>
+</html>
