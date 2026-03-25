@@ -3,41 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WK-Pool 2026</title>
+<title>WK Fantasy League 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* ====== LIGHT THEME (default) ====== */
-  :root,  [data-theme="light"] {
-    --pitch: #e8f5ee;
-    --neon: #0a8f3a;
-    --neon-dim: #1aaa50;
-    --gold: #c8960a;
-    --red: #d42b2b;
-    --fg: #0d1f12;
-    --fg-muted: #5a7a62;
-    --bg: #f2faf5;
-    --card: #ffffff;
-    --border: rgba(10,143,58,0.2);
-    --input-bg: rgba(0,0,0,0.03);
-    --input-focus-bg: rgba(10,143,58,0.06);
-    --grid-line: rgba(10,143,58,0.04);
-    --header-glow: rgba(10,143,58,0.07);
-    --match-card-bg: rgba(0,0,0,0.02);
-    --row-hover: rgba(10,143,58,0.04);
-    --pts-bg: rgba(10,143,58,0.12);
-    --pts-zero-bg: rgba(212,43,43,0.08);
-    --knock-selected: rgba(10,143,58,0.1);
-    --info-pill-bg: rgba(10,143,58,0.07);
-    --pts-ref-bg: rgba(10,143,58,0.06);
-    --detail-score-bg: rgba(10,143,58,0.07);
-    --detail-meta-bg: rgba(10,143,58,0.04);
-    --csv-bg: rgba(0,0,0,0.04);
-    --theme-toggle-icon: '🌙';
-    --select-opt-bg: #e8f5ee;
-  }
-
-  /* ====== DARK THEME ====== */
-  [data-theme="dark"] {
+  /* ====== DARK THEME (default) ====== */
+  :root, [data-theme="dark"] {
     --pitch: #0a3d1f;
     --neon: #39ff6a;
     --neon-dim: #1d9e40;
@@ -64,6 +34,36 @@
     --csv-bg: rgba(0,0,0,0.3);
     --theme-toggle-icon: '☀️';
     --select-opt-bg: #0a3d1f;
+  }
+
+  /* ====== LIGHT THEME ====== */
+  [data-theme="light"] {
+    --pitch: #e8f5ee;
+    --neon: #0a8f3a;
+    --neon-dim: #1aaa50;
+    --gold: #c8960a;
+    --red: #d42b2b;
+    --fg: #0d1f12;
+    --fg-muted: #5a7a62;
+    --bg: #f2faf5;
+    --card: #ffffff;
+    --border: rgba(10,143,58,0.2);
+    --input-bg: rgba(0,0,0,0.03);
+    --input-focus-bg: rgba(10,143,58,0.06);
+    --grid-line: rgba(10,143,58,0.04);
+    --header-glow: rgba(10,143,58,0.07);
+    --match-card-bg: rgba(0,0,0,0.02);
+    --row-hover: rgba(10,143,58,0.04);
+    --pts-bg: rgba(10,143,58,0.12);
+    --pts-zero-bg: rgba(212,43,43,0.08);
+    --knock-selected: rgba(10,143,58,0.1);
+    --info-pill-bg: rgba(10,143,58,0.07);
+    --pts-ref-bg: rgba(10,143,58,0.06);
+    --detail-score-bg: rgba(10,143,58,0.07);
+    --detail-meta-bg: rgba(10,143,58,0.04);
+    --csv-bg: rgba(0,0,0,0.04);
+    --theme-toggle-icon: '🌙';
+    --select-opt-bg: #e8f5ee;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -783,8 +783,8 @@
 
 <header>
   <span class="trophy-icon">🏆</span>
-  <h1>WK <span>POOL</span> 2026</h1>
-  <p class="subtitle">Voorspel en win! &mdash; Eeuwige roem ligt in het vooruitzicht</p>
+  <h1>WK <span>Fantasy</span> 2026</h1>
+  <p class="subtitle">Doe jouw voorspellingen &mdash; glorie wacht</p>
 </header>
 
 <nav>
@@ -826,7 +826,7 @@
   <!-- ======= VOORSPELLINGEN ======= -->
   <div id="view-voorspel" class="view">
     <div class="section-title">Jouw Voorspellingen</div>
-    <p class="section-desc">Vul al je uitslagvoorspellingen in voor de hele groepsfase!</p>
+    <p class="section-desc">Vul al je picks in voor het hele toernooi</p>
 
     <div class="card">
       <div class="card-title">Jouw naam</div>
@@ -862,25 +862,25 @@
       <div class="card-title">Knock-outfase — Welke teams gaan door?</div>
 
       <div class="knockout-section">
-        <div class="knockout-round-title">Ronde van 16 — Kies 16 teams (10 punten per team)</div>
+        <div class="knockout-round-title">Ronde van 16 — Kies 16 teams (10 ptn per team)</div>
         <div class="team-checkboxes" id="r16-picks"></div>
         <p id="r16-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 16 geselecteerd</p>
       </div>
 
       <div class="knockout-section">
-        <div class="knockout-round-title">Kwartfinales — Kies 8 teams (15 punten per team)</div>
+        <div class="knockout-round-title">Kwartfinales — Kies 8 teams (15 ptn per team)</div>
         <div class="team-checkboxes" id="qf-picks"></div>
         <p id="qf-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 8 geselecteerd</p>
       </div>
 
       <div class="knockout-section">
-        <div class="knockout-round-title">Halve Finales — Kies 4 teams (20 punten per team)</div>
+        <div class="knockout-round-title">Halve Finales — Kies 4 teams (20 ptn per team)</div>
         <div class="team-checkboxes" id="sf-picks"></div>
         <p id="sf-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 4 geselecteerd</p>
       </div>
 
       <div class="knockout-section">
-        <div class="knockout-round-title">Finale — Kies 2 teams (25 punten per team)</div>
+        <div class="knockout-round-title">Finale — Kies 2 teams (25 ptn per team)</div>
         <div class="team-checkboxes" id="final-picks"></div>
         <p id="final-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 2 geselecteerd</p>
       </div>
@@ -891,13 +891,13 @@
       <div class="card-title">Speciale Picks</div>
       <div class="special-picks">
         <div class="form-group">
-          <label>🏆 Kampioen (30 punten)</label>
+          <label>🏆 Kampioen (30 ptn)</label>
           <select id="pick-champion">
             <option value="">— Selecteer land —</option>
           </select>
         </div>
         <div class="form-group">
-          <label>⚽ Topscorer (25 punten)</label>
+          <label>⚽ Topscorer (25 ptn)</label>
           <input type="text" id="pick-topscorer" placeholder="bijv. Mbappé">
         </div>
       </div>
@@ -1169,6 +1169,34 @@ const POINTS = { correct_result: 3, exact_score: 6, r16: 10, qf: 15, sf: 20, fin
 const LIMITS = { r16: 16, qf: 8, sf: 4, final: 2 };
 
 // =============================================
+// SUPABASE CONFIGURATIE
+// Vervang de twee regels hieronder met jouw eigen waarden
+// uit Supabase → Project Settings → API
+// =============================================
+const SUPABASE_URL = 'JOUW_SUPABASE_URL_HIER';       // bijv. https://xyzxyz.supabase.co
+const SUPABASE_ANON_KEY = 'JOUW_SUPABASE_ANON_KEY_HIER'; // begint met eyJ...
+
+// Hulpfunctie voor Supabase REST API aanroepen
+async function sb(path, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+      ...options.headers
+    },
+    ...options
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `HTTP ${res.status}`);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+// =============================================
 // STATE
 // =============================================
 let participants = [];
@@ -1177,20 +1205,114 @@ let adminUnlocked = false;
 
 function matchKey(g, a, b) { return `${g}_${a}_${b}`; }
 
-function loadState() {
+async function loadState() {
+  const theme = localStorage.getItem('wkf_nl_theme');
+  if (theme) applyTheme(theme);
+
   try {
-    const p = localStorage.getItem('wkf_nl_participants');
-    const r = localStorage.getItem('wkf_nl_results');
-    const theme = localStorage.getItem('wkf_nl_theme');
-    if (p) participants = JSON.parse(p);
-    if (r) results = { ...results, ...JSON.parse(r) };
-    if (theme) applyTheme(theme);
-  } catch(e) {}
+    // Laad deelnemers
+    const rows = await sb('participants?select=*&order=submitted_at.asc');
+    participants = (rows || []).map(r => ({
+      name: r.name,
+      scores: r.scores || {},
+      knockout: r.knockout || { r16:[], qf:[], sf:[], final:[] },
+      champion: r.champion || '',
+      top_scorer: r.top_scorer || '',
+      submitted: r.submitted_at
+    }));
+
+    // Laad uitslagen
+    const rRows = await sb('results?id=eq.1&select=*');
+    if (rRows && rRows[0]) {
+      const r = rRows[0];
+      results = {
+        matches: r.matches || {},
+        r16: r.r16 || [],
+        qf: r.qf || [],
+        sf: r.sf || [],
+        final: r.final_teams || [],
+        champion: r.champion || '',
+        top_scorer: r.top_scorer || ''
+      };
+    }
+  } catch(e) {
+    console.warn('Supabase laden mislukt, lokale opslag wordt gebruikt als fallback:', e);
+    // Fallback naar localStorage als Supabase niet bereikbaar is
+    try {
+      const p = localStorage.getItem('wkf_nl_participants');
+      const r = localStorage.getItem('wkf_nl_results');
+      if (p) participants = JSON.parse(p);
+      if (r) results = { ...results, ...JSON.parse(r) };
+    } catch(e2) {}
+  }
 }
 
-function saveState() {
-  localStorage.setItem('wkf_nl_participants', JSON.stringify(participants));
-  localStorage.setItem('wkf_nl_results', JSON.stringify(results));
+async function saveParticipant(p) {
+  // Upsert op basis van naam (naam is uniek)
+  await sb('participants', {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates,return=representation',
+    headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify({
+      name: p.name,
+      scores: p.scores,
+      knockout: p.knockout,
+      champion: p.champion,
+      top_scorer: p.top_scorer,
+      submitted_at: p.submitted || new Date().toISOString()
+    })
+  });
+}
+
+async function saveResults() {
+  // Lees waarden uit het formulier
+  for (const [group, gdata] of Object.entries(GROUPS)) {
+    for (const [a, b] of gdata.matches) {
+      const key = matchKey(group, a, b);
+      const va = document.getElementById(`res_${key}_a`)?.value;
+      const vb = document.getElementById(`res_${key}_b`)?.value;
+      const played = document.getElementById(`played_${key}`)?.checked;
+      results.matches[key] = { a: va, b: vb, played };
+    }
+  }
+  const rounds = ['r16','qf','sf','final'];
+  for (const round of rounds) {
+    results[round] = [...document.querySelectorAll(`#admin-${round} .team-check.selected`)].map(el => el.querySelector('input').value);
+  }
+  results.champion = document.getElementById('admin-champion').value;
+  results.top_scorer = document.getElementById('admin-topscorer').value.trim();
+
+  try {
+    await sb('results?id=eq.1', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        matches: results.matches,
+        r16: results.r16,
+        qf: results.qf,
+        sf: results.sf,
+        final_teams: results.final,
+        champion: results.champion,
+        top_scorer: results.top_scorer,
+        updated_at: new Date().toISOString()
+      })
+    });
+    renderLeaderboard();
+    showToast('Uitslagen opgeslagen & ranglijst bijgewerkt ✓');
+  } catch(e) {
+    showToast('Opslaan mislukt: ' + e.message, true);
+  }
+}
+
+async function clearAllParticipants() {
+  if (!confirm('Alle voorspellingen verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
+  try {
+    await sb('participants?id=neq.00000000-0000-0000-0000-000000000000', { method: 'DELETE' });
+    participants = [];
+    renderLeaderboard();
+    showToast('Alle deelnemers verwijderd');
+  } catch(e) {
+    showToast('Verwijderen mislukt: ' + e.message, true);
+  }
 }
 
 function getAdminPassword() {
@@ -1444,13 +1566,12 @@ function switchGroupTab(group, prefix) {
   if (contentEl) contentEl.classList.add('active');
 }
 
-function submitPredictions() {
+async function submitPredictions() {
   const name = document.getElementById('predict-name').value.trim();
   if (!name) { showToast('Vul eerst je naam in', true); return; }
 
   if (participants.find(p => p.name.toLowerCase() === name.toLowerCase())) {
     if (!confirm(`Er bestaat al een voorspelling voor "${name}". Overschrijven?`)) return;
-    participants = participants.filter(p => p.name.toLowerCase() !== name.toLowerCase());
   }
 
   const scores = {};
@@ -1472,11 +1593,18 @@ function submitPredictions() {
 
   const champion = document.getElementById('pick-champion').value;
   const top_scorer = document.getElementById('pick-topscorer').value.trim();
+  const p = { name, scores, knockout, champion, top_scorer, submitted: new Date().toISOString() };
 
-  participants.push({ name, scores, knockout, champion, top_scorer, submitted: new Date().toISOString() });
-  saveState();
-  showToast('Voorspellingen opgeslagen! Veel succes 🎉');
-  showView('ranglijst');
+  showToast('Opslaan...');
+  try {
+    await saveParticipant(p);
+    participants = participants.filter(x => x.name.toLowerCase() !== name.toLowerCase());
+    participants.push(p);
+    showToast('Voorspellingen opgeslagen! Veel succes 🎉');
+    showView('ranglijst');
+  } catch(e) {
+    showToast('Opslaan mislukt: ' + e.message, true);
+  }
 }
 
 // =============================================
@@ -1522,7 +1650,7 @@ function handleCSVUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const lines = e.target.result.split('\n').filter(l => l.trim() && !l.startsWith('#'));
       const byName = {};
@@ -1549,13 +1677,17 @@ function handleCSVUpload(event) {
       }
 
       let added = 0;
+      const promises = [];
       for (const p of Object.values(byName)) {
-        participants = participants.filter(x => x.name.toLowerCase() !== p.name.toLowerCase());
-        participants.push({ ...p, submitted: new Date().toISOString() });
-        added++;
+        p.submitted = new Date().toISOString();
+        promises.push(saveParticipant(p).then(() => {
+          participants = participants.filter(x => x.name.toLowerCase() !== p.name.toLowerCase());
+          participants.push(p);
+          added++;
+        }));
       }
+      await Promise.all(promises);
 
-      saveState();
       showToast(`${added} deelnemer(s) geïmporteerd ✓`);
       showView('ranglijst');
     } catch(err) {
@@ -1663,38 +1795,6 @@ function toggleAdminKnock(round, team, limit) {
   el.querySelector('input').checked = !selected;
 }
 
-function saveResults() {
-  for (const [group, gdata] of Object.entries(GROUPS)) {
-    for (const [a, b] of gdata.matches) {
-      const key = matchKey(group, a, b);
-      const va = document.getElementById(`res_${key}_a`)?.value;
-      const vb = document.getElementById(`res_${key}_b`)?.value;
-      const played = document.getElementById(`played_${key}`)?.checked;
-      results.matches[key] = { a: va, b: vb, played };
-    }
-  }
-
-  const rounds = ['r16','qf','sf','final'];
-  for (const round of rounds) {
-    results[round] = [...document.querySelectorAll(`#admin-${round} .team-check.selected`)].map(el => el.querySelector('input').value);
-  }
-
-  results.champion = document.getElementById('admin-champion').value;
-  results.top_scorer = document.getElementById('admin-topscorer').value.trim();
-
-  saveState();
-  renderLeaderboard();
-  showToast('Uitslagen opgeslagen & ranglijst bijgewerkt ✓');
-}
-
-function clearAllParticipants() {
-  if (!confirm('Alle voorspellingen verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
-  participants = [];
-  saveState();
-  renderLeaderboard();
-  showToast('Alle deelnemers verwijderd');
-}
-
 function exportData() {
   const data = { participants, results, exported: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1751,10 +1851,16 @@ uploadArea.addEventListener('drop', e => {
 // =============================================
 // INIT
 // =============================================
-loadState();
-buildPredictForm();
-buildCSVExample();
-renderLeaderboard();
+(async () => {
+  // Toon laad-indicator
+  document.getElementById('leaderboard-body').innerHTML =
+    `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--fg-muted);letter-spacing:2px;font-family:'Barlow Condensed';text-transform:uppercase;font-size:13px">Verbinden met database...</td></tr>`;
+
+  await loadState();
+  buildPredictForm();
+  buildCSVExample();
+  renderLeaderboard();
+})();
 </script>
 </body>
 </html>
