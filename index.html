@@ -288,7 +288,7 @@
     margin-bottom: 6px;
   }
 
-  input[type="text"], input[type="number"], input[type="password"], select {
+  input[type="text"], input[type="number"], input[type="password"], input[type="email"], select {
     width: 100%;
     background: var(--input-bg);
     border: 1px solid var(--border);
@@ -538,35 +538,7 @@
     text-align: right;
   }
 
-  /* ====== UPLOAD ====== */
-  .upload-area {
-    border: 2px dashed var(--border);
-    padding: 48px 28px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .upload-area:hover, .upload-area.dragover {
-    border-color: var(--neon);
-    background: var(--knock-selected);
-  }
-
-  .upload-area input { display: none; }
-  .upload-icon { font-size: 40px; margin-bottom: 12px; display: block; }
-
-  .upload-text {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--fg-muted);
-  }
-
-  .upload-subtext { font-size: 12px; color: var(--neon-dim); margin-top: 8px; }
-
-  /* ====== TOAST ====== */
+  /* ====== EMPTY STATE ====== */
   #toast {
     position: fixed;
     bottom: 30px; right: 30px;
@@ -713,19 +685,6 @@
 
   .pts-badge.zero { background: var(--pts-zero-bg); color: var(--fg-muted); }
 
-  /* ====== CSV ====== */
-  .csv-example {
-    background: var(--csv-bg);
-    border: 1px solid var(--border);
-    padding: 16px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    color: var(--neon-dim);
-    overflow-x: auto;
-    white-space: pre;
-    margin: 16px 0;
-  }
-
   /* ====== EMPTY STATE ====== */
   .empty-state { text-align: center; padding: 60px 20px; color: var(--fg-muted); }
   .empty-state-icon { font-size: 48px; margin-bottom: 16px; display: block; }
@@ -790,7 +749,6 @@
 <nav>
   <button class="nav-btn active" onclick="showView('ranglijst')">🏅 Ranglijst</button>
   <button class="nav-btn" onclick="showView('voorspel')">📝 Voorspellingen</button>
-  <button class="nav-btn" onclick="showView('upload')">📤 Upload CSV</button>
   <button class="nav-btn" onclick="showView('admin')">⚙️ Admin</button>
 </nav>
 
@@ -811,6 +769,7 @@
             <th>Deelnemer</th>
             <th>Groepsfase</th>
             <th>Knock-out</th>
+            <th>Bonus</th>
             <th style="text-align:right">Totaal</th>
           </tr>
         </thead>
@@ -829,9 +788,14 @@
     <p class="section-desc">Vul al je picks in voor het hele toernooi</p>
 
     <div class="card">
-      <div class="card-title">Jouw naam</div>
+      <div class="card-title">Jouw gegevens</div>
       <div class="form-group">
+        <label>Naam</label>
         <input type="text" id="predict-name" placeholder="Vul je naam in...">
+      </div>
+      <div class="form-group">
+        <label>E-mailadres</label>
+        <input type="email" id="predict-email" placeholder="jouw@email.nl">
       </div>
     </div>
 
@@ -847,6 +811,16 @@
         <div class="points-ref-item"><strong>25</strong><span>Finalist correct</span></div>
         <div class="points-ref-item"><strong>30</strong><span>Kampioen correct</span></div>
         <div class="points-ref-item"><strong>25</strong><span>Topscorer correct</span></div>
+        <div class="points-ref-item"><strong>15</strong><span>Eerste doelpuntenmaker</span></div>
+        <div class="points-ref-item"><strong>20</strong><span>Laatste doelpuntenmaker</span></div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:var(--pts-ref-bg);border:1px solid var(--border)">
+        <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">🎯 Groepsfase Bonuspunten</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="font-size:12px;color:var(--fg-muted)"><strong style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);display:block">+10</strong>8–15 goede uitslagen</div>
+          <div style="font-size:12px;color:var(--fg-muted)"><strong style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);display:block">+25</strong>16–23 goede uitslagen</div>
+          <div style="font-size:12px;color:var(--fg-muted)"><strong style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);display:block">+50</strong>24+ goede uitslagen</div>
+        </div>
       </div>
     </div>
 
@@ -900,37 +874,18 @@
           <label>⚽ Topscorer (25 ptn)</label>
           <input type="text" id="pick-topscorer" placeholder="bijv. Mbappé">
         </div>
+        <div class="form-group">
+          <label>🥇 Eerste doelpuntenmaker toernooi (15 ptn)</label>
+          <input type="text" id="pick-first-scorer" placeholder="bijv. Mbappé">
+        </div>
+        <div class="form-group">
+          <label>🏁 Laatste doelpuntenmaker toernooi (20 ptn)</label>
+          <input type="text" id="pick-last-scorer" placeholder="bijv. Mbappé">
+        </div>
       </div>
     </div>
 
     <button class="btn btn-primary" onclick="submitPredictions()">✓ Verstuur Mijn Voorspellingen</button>
-  </div>
-
-  <!-- ======= UPLOAD ======= -->
-  <div id="view-upload" class="view">
-    <div class="section-title">Upload CSV</div>
-    <p class="section-desc">Upload een ingevuld voorspellingsformulier</p>
-
-    <div class="card">
-      <div class="card-title">Download Sjabloon</div>
-      <p style="font-size:13px;color:var(--fg-muted);margin-bottom:16px">Download het CSV-sjabloon, vul het in en upload het hieronder.</p>
-      <button class="btn btn-secondary" onclick="downloadTemplate()">⬇ Download CSV-sjabloon</button>
-
-      <div style="margin-top:20px">
-        <p style="font-size:12px;color:var(--fg-muted);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase">CSV-formaat (voorbeeld):</p>
-        <div class="csv-example" id="csv-example-preview"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Upload Jouw Voorspellingen</div>
-      <div class="upload-area" id="upload-area" onclick="document.getElementById('csv-input').click()">
-        <input type="file" id="csv-input" accept=".csv" onchange="handleCSVUpload(event)">
-        <span class="upload-icon">📂</span>
-        <p class="upload-text">Klik of sleep je CSV hierheen</p>
-        <p class="upload-subtext">Alleen .csv bestanden</p>
-      </div>
-    </div>
   </div>
 
   <!-- ======= ADMIN ======= -->
@@ -1014,6 +969,14 @@
           <div class="form-group">
             <label>⚽ Werkelijke Topscorer</label>
             <input type="text" id="admin-topscorer" placeholder="bijv. Mbappé">
+          </div>
+          <div class="form-group">
+            <label>🥇 Eerste doelpuntenmaker toernooi</label>
+            <input type="text" id="admin-first-scorer" placeholder="bijv. Mbappé">
+          </div>
+          <div class="form-group">
+            <label>🏁 Laatste doelpuntenmaker toernooi</label>
+            <input type="text" id="admin-last-scorer" placeholder="bijv. Mbappé">
           </div>
         </div>
       </div>
@@ -1165,7 +1128,12 @@ const GROUPS = {
 
 const ALL_TEAMS = Object.values(GROUPS).flatMap(g => g.teams).sort((a,b) => a.localeCompare(b, 'nl'));
 
-const POINTS = { correct_result: 3, exact_score: 6, r16: 10, qf: 15, sf: 20, final: 25, champion: 30, top_scorer: 25 };
+const POINTS = {
+  correct_result: 3, exact_score: 6,
+  r16: 10, qf: 15, sf: 20, final: 25, champion: 30,
+  top_scorer: 25, first_scorer: 15, last_scorer: 20,
+  bonus_8: 10, bonus_16: 25, bonus_24: 50
+};
 const LIMITS = { r16: 16, qf: 8, sf: 4, final: 2 };
 
 // =============================================
@@ -1174,7 +1142,7 @@ const LIMITS = { r16: 16, qf: 8, sf: 4, final: 2 };
 // uit Supabase → Project Settings → API
 // =============================================
 const SUPABASE_URL = 'https://dxarhjhjgdmlsnpqzkjp.supabase.co';       // bijv. https://xyzxyz.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4YXJoamhqZ2RtbHNucHF6a2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MjQ4OTMsImV4cCI6MjA5MDAwMDg5M30.Y8Y-lm7hrmcFHhI92BpFXCkwqoWykTaa-QyzL-ESxOw'; // begint met eyJ...
+const SUPABASE_ANON_KEY = 'sb_publishable_tU__JNEiE_HNJxkKIAILjw_OifhLq2V'; // begint met eyJ...
 
 // Hulpfunctie voor Supabase REST API aanroepen
 async function sb(path, options = {}) {
@@ -1200,7 +1168,7 @@ async function sb(path, options = {}) {
 // STATE
 // =============================================
 let participants = [];
-let results = { matches: {}, r16: [], qf: [], sf: [], final: [], champion: '', top_scorer: '' };
+let results = { matches: {}, r16: [], qf: [], sf: [], final: [], champion: '', top_scorer: '', first_scorer: '', last_scorer: '' };
 let adminUnlocked = false;
 
 function matchKey(g, a, b) { return `${g}_${a}_${b}`; }
@@ -1210,18 +1178,19 @@ async function loadState() {
   if (theme) applyTheme(theme);
 
   try {
-    // Laad deelnemers
     const rows = await sb('participants?select=*&order=submitted_at.asc');
     participants = (rows || []).map(r => ({
       name: r.name,
+      email: r.email || '',
       scores: r.scores || {},
       knockout: r.knockout || { r16:[], qf:[], sf:[], final:[] },
       champion: r.champion || '',
       top_scorer: r.top_scorer || '',
+      first_scorer: r.first_scorer || '',
+      last_scorer: r.last_scorer || '',
       submitted: r.submitted_at
     }));
 
-    // Laad uitslagen
     const rRows = await sb('results?id=eq.1&select=*');
     if (rRows && rRows[0]) {
       const r = rRows[0];
@@ -1232,12 +1201,13 @@ async function loadState() {
         sf: r.sf || [],
         final: r.final_teams || [],
         champion: r.champion || '',
-        top_scorer: r.top_scorer || ''
+        top_scorer: r.top_scorer || '',
+        first_scorer: r.first_scorer || '',
+        last_scorer: r.last_scorer || ''
       };
     }
   } catch(e) {
     console.warn('Supabase laden mislukt, lokale opslag wordt gebruikt als fallback:', e);
-    // Fallback naar localStorage als Supabase niet bereikbaar is
     try {
       const p = localStorage.getItem('wkf_nl_participants');
       const r = localStorage.getItem('wkf_nl_results');
@@ -1248,24 +1218,25 @@ async function loadState() {
 }
 
 async function saveParticipant(p) {
-  // Upsert op basis van naam (naam is uniek)
   await sb('participants', {
     method: 'POST',
     prefer: 'resolution=merge-duplicates,return=representation',
     headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
     body: JSON.stringify({
       name: p.name,
+      email: p.email,
       scores: p.scores,
       knockout: p.knockout,
       champion: p.champion,
       top_scorer: p.top_scorer,
+      first_scorer: p.first_scorer,
+      last_scorer: p.last_scorer,
       submitted_at: p.submitted || new Date().toISOString()
     })
   });
 }
 
 async function saveResults() {
-  // Lees waarden uit het formulier
   for (const [group, gdata] of Object.entries(GROUPS)) {
     for (const [a, b] of gdata.matches) {
       const key = matchKey(group, a, b);
@@ -1281,6 +1252,8 @@ async function saveResults() {
   }
   results.champion = document.getElementById('admin-champion').value;
   results.top_scorer = document.getElementById('admin-topscorer').value.trim();
+  results.first_scorer = document.getElementById('admin-first-scorer').value.trim();
+  results.last_scorer = document.getElementById('admin-last-scorer').value.trim();
 
   try {
     await sb('results?id=eq.1', {
@@ -1293,6 +1266,8 @@ async function saveResults() {
         final_teams: results.final,
         champion: results.champion,
         top_scorer: results.top_scorer,
+        first_scorer: results.first_scorer,
+        last_scorer: results.last_scorer,
         updated_at: new Date().toISOString()
       })
     });
@@ -1340,7 +1315,8 @@ function toggleTheme() {
 // SCORING
 // =============================================
 function scoreParticipant(p) {
-  let groupPts = 0, knockoutPts = 0, breakdown = [];
+  let groupPts = 0, knockoutPts = 0, bonusPts = 0, breakdown = [];
+  let correctGroupCount = 0;
 
   for (const [group, gdata] of Object.entries(GROUPS)) {
     for (const [a, b] of gdata.matches) {
@@ -1355,14 +1331,29 @@ function scoreParticipant(p) {
 
       if (pA === rA && pB === rB) {
         groupPts += POINTS.exact_score;
+        correctGroupCount++;
         breakdown.push({ match: `${a} vs ${b}`, predicted: `${pA}-${pB}`, actual: `${rA}-${rB}`, pts: POINTS.exact_score, reason: 'Exacte score' });
       } else if (Math.sign(pA - pB) === Math.sign(rA - rB)) {
         groupPts += POINTS.correct_result;
+        correctGroupCount++;
         breakdown.push({ match: `${a} vs ${b}`, predicted: `${pA}-${pB}`, actual: `${rA}-${rB}`, pts: POINTS.correct_result, reason: 'Juiste uitslag' });
       } else {
         breakdown.push({ match: `${a} vs ${b}`, predicted: `${pA}-${pB}`, actual: `${rA}-${rB}`, pts: 0, reason: 'Fout' });
       }
     }
+  }
+
+  // Groepsfase bonuspunten
+  let bonusLabel = '';
+  if (correctGroupCount >= 24) {
+    bonusPts = POINTS.bonus_24;
+    bonusLabel = `24+ goede uitslagen (${correctGroupCount})`;
+  } else if (correctGroupCount >= 16) {
+    bonusPts = POINTS.bonus_16;
+    bonusLabel = `16–23 goede uitslagen (${correctGroupCount})`;
+  } else if (correctGroupCount >= 8) {
+    bonusPts = POINTS.bonus_8;
+    bonusLabel = `8–15 goede uitslagen (${correctGroupCount})`;
   }
 
   const rounds = [['r16', POINTS.r16], ['qf', POINTS.qf], ['sf', POINTS.sf], ['final', POINTS.final]];
@@ -1380,7 +1371,17 @@ function scoreParticipant(p) {
   if (p.top_scorer && results.top_scorer && p.top_scorer.toLowerCase() === results.top_scorer.toLowerCase())
     knockoutPts += POINTS.top_scorer;
 
-  return { groupPts, knockoutPts, total: groupPts + knockoutPts, breakdown };
+  if (p.first_scorer && results.first_scorer && p.first_scorer.toLowerCase() === results.first_scorer.toLowerCase())
+    knockoutPts += POINTS.first_scorer;
+
+  if (p.last_scorer && results.last_scorer && p.last_scorer.toLowerCase() === results.last_scorer.toLowerCase())
+    knockoutPts += POINTS.last_scorer;
+
+  return {
+    groupPts, knockoutPts, bonusPts,
+    total: groupPts + knockoutPts + bonusPts,
+    correctGroupCount, bonusLabel, breakdown
+  };
 }
 
 // =============================================
@@ -1393,7 +1394,7 @@ function renderLeaderboard() {
   const body = document.getElementById('leaderboard-body');
 
   if (scored.length === 0) {
-    body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><span class="empty-state-icon">📋</span><div class="empty-state-text">Nog geen voorspellingen</div><p style="font-size:12px;color:var(--fg-muted)">Deelnemers kunnen via het formulier of CSV uploaden</p></div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><span class="empty-state-icon">📋</span><div class="empty-state-text">Nog geen voorspellingen</div><p style="font-size:12px;color:var(--fg-muted)">Deelnemers kunnen voorspellingen indienen via het formulier</p></div></td></tr>`;
   } else {
     body.innerHTML = scored.map((p, i) => `
       <tr class="rank-${i+1}" style="cursor:pointer" onclick="toggleParticipantDetail('${p.name.replace(/'/g,"\\'")}')">
@@ -1401,6 +1402,7 @@ function renderLeaderboard() {
         <td><div class="participant-name">${p.name}</div></td>
         <td style="color:var(--fg-muted)">${p.groupPts}</td>
         <td style="color:var(--fg-muted)">${p.knockoutPts}</td>
+        <td style="color:var(--gold)">${p.bonusPts > 0 ? '+'+p.bonusPts : '—'}</td>
         <td class="score-cell">${p.total}</td>
       </tr>
     `).join('');
@@ -1455,10 +1457,13 @@ function toggleParticipantDetail(name) {
       <div style="background:var(--detail-score-bg);padding:12px;border:1px solid var(--border)">
         <strong style="font-family:'Bebas Neue';font-size:28px;color:var(--neon)">${scored.total}</strong>
         <div style="font-size:11px;color:var(--fg-muted);letter-spacing:1px;text-transform:uppercase">Totaal punten</div>
+        ${scored.bonusPts > 0 ? `<div style="font-size:11px;color:var(--gold);margin-top:6px">🎯 +${scored.bonusPts} bonus — ${scored.bonusLabel}</div>` : scored.correctGroupCount > 0 ? `<div style="font-size:11px;color:var(--fg-muted);margin-top:6px">${scored.correctGroupCount} goede groepsuitslagen</div>` : ''}
       </div>
       <div style="background:var(--detail-meta-bg);padding:12px;border:1px solid var(--border)">
         <div style="font-size:12px;color:var(--fg-muted)">🏆 Kampioen: <strong style="color:var(--fg)">${p.champion || '—'}</strong></div>
         <div style="font-size:12px;color:var(--fg-muted);margin-top:4px">⚽ Topscorer: <strong style="color:var(--fg)">${p.top_scorer || '—'}</strong></div>
+        <div style="font-size:12px;color:var(--fg-muted);margin-top:4px">🥇 Eerste doelpunt: <strong style="color:var(--fg)">${p.first_scorer || '—'}</strong></div>
+        <div style="font-size:12px;color:var(--fg-muted);margin-top:4px">🏁 Laatste doelpunt: <strong style="color:var(--fg)">${p.last_scorer || '—'}</strong></div>
       </div>
     </div>
     ${matchRows ? `<div style="margin-bottom:12px">${matchRows}</div>` : ''}
@@ -1568,7 +1573,9 @@ function switchGroupTab(group, prefix) {
 
 async function submitPredictions() {
   const name = document.getElementById('predict-name').value.trim();
+  const email = document.getElementById('predict-email').value.trim();
   if (!name) { showToast('Vul eerst je naam in', true); return; }
+  if (!email || !email.includes('@')) { showToast('Vul een geldig e-mailadres in', true); return; }
 
   if (participants.find(p => p.name.toLowerCase() === name.toLowerCase())) {
     if (!confirm(`Er bestaat al een voorspelling voor "${name}". Overschrijven?`)) return;
@@ -1593,7 +1600,10 @@ async function submitPredictions() {
 
   const champion = document.getElementById('pick-champion').value;
   const top_scorer = document.getElementById('pick-topscorer').value.trim();
-  const p = { name, scores, knockout, champion, top_scorer, submitted: new Date().toISOString() };
+  const first_scorer = document.getElementById('pick-first-scorer').value.trim();
+  const last_scorer = document.getElementById('pick-last-scorer').value.trim();
+
+  const p = { name, email, scores, knockout, champion, top_scorer, first_scorer, last_scorer, submitted: new Date().toISOString() };
 
   showToast('Opslaan...');
   try {
@@ -1605,96 +1615,6 @@ async function submitPredictions() {
   } catch(e) {
     showToast('Opslaan mislukt: ' + e.message, true);
   }
-}
-
-// =============================================
-// CSV UPLOAD
-// =============================================
-function buildCSVExample() {
-  const lines = ['naam,type,sleutel,waarde_a,waarde_b'];
-  const g = Object.entries(GROUPS)[0];
-  lines.push(`Jan Jansen,wedstrijd,${g[0]}_${g[1].matches[0][0]}_${g[1].matches[0][1]},2,1`);
-  lines.push(`Jan Jansen,r16,${g[1].teams[0]},`);
-  lines.push(`Jan Jansen,kampioen,${g[1].teams[0]},`);
-  lines.push(`Jan Jansen,topscorer,Mbappé,`);
-  document.getElementById('csv-example-preview').textContent = lines.join('\n');
-}
-
-function downloadTemplate() {
-  let csv = 'naam,type,sleutel,waarde_a,waarde_b\n';
-  csv += '# Vul je naam in de kolom "naam" voor elke rij\n';
-  csv += '# Voor groepswedstrijden: type=wedstrijd, sleutel=GroepX_TeamA_TeamB, waarde_a=score, waarde_b=score\n';
-  csv += '# Voor knock-out: type=r16/kw/hf/finale, sleutel=Teamnaam\n';
-  csv += '# Voor special: type=kampioen of topscorer, sleutel=waarde\n\n';
-
-  for (const [group, gdata] of Object.entries(GROUPS)) {
-    for (const [a, b] of gdata.matches) {
-      csv += `JouwNaam,wedstrijd,${matchKey(group,a,b)},0,0\n`;
-    }
-  }
-  for (const team of ALL_TEAMS) {
-    csv += `JouwNaam,r16,${team},,\n`;
-  }
-  csv += `JouwNaam,kampioen,Landnaam,,\n`;
-  csv += `JouwNaam,topscorer,Spelernaam,,\n`;
-
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'wk_fantasy_sjabloon.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function handleCSVUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try {
-      const lines = e.target.result.split('\n').filter(l => l.trim() && !l.startsWith('#'));
-      const byName = {};
-
-      for (const line of lines.slice(1)) {
-        const cols = line.split(',').map(c => c.trim());
-        if (cols.length < 3) continue;
-        const [name, type, key] = cols;
-        if (!name || !type || !key) continue;
-        if (!byName[name]) byName[name] = { name, scores: {}, knockout: { r16:[], qf:[], sf:[], final:[] }, champion:'', top_scorer:'' };
-
-        const p = byName[name];
-        if (type === 'wedstrijd') {
-          p.scores[key] = { a: cols[3] || '0', b: cols[4] || '0' };
-        } else if (['r16','kw','hf','finale'].includes(type)) {
-          const roundMap = { r16:'r16', kw:'qf', hf:'sf', finale:'final' };
-          const r = roundMap[type];
-          if (key && !p.knockout[r].includes(key)) p.knockout[r].push(key);
-        } else if (type === 'kampioen') {
-          p.champion = key;
-        } else if (type === 'topscorer') {
-          p.top_scorer = key;
-        }
-      }
-
-      let added = 0;
-      const promises = [];
-      for (const p of Object.values(byName)) {
-        p.submitted = new Date().toISOString();
-        promises.push(saveParticipant(p).then(() => {
-          participants = participants.filter(x => x.name.toLowerCase() !== p.name.toLowerCase());
-          participants.push(p);
-          added++;
-        }));
-      }
-      await Promise.all(promises);
-
-      showToast(`${added} deelnemer(s) geïmporteerd ✓`);
-      showView('ranglijst');
-    } catch(err) {
-      showToast('Fout bij verwerken CSV — controleer het formaat', true);
-    }
-  };
-  reader.readAsText(file);
 }
 
 // =============================================
@@ -1767,6 +1687,8 @@ function buildAdminPanel() {
   const sel = document.getElementById('admin-champion');
   sel.innerHTML = '<option value="">— Nog niet beslist —</option>' + ALL_TEAMS.map(t => `<option value="${t}" ${results.champion === t ? 'selected' : ''}>${t}</option>`).join('');
   document.getElementById('admin-topscorer').value = results.top_scorer || '';
+  document.getElementById('admin-first-scorer').value = results.first_scorer || '';
+  document.getElementById('admin-last-scorer').value = results.last_scorer || '';
 }
 
 function buildAdminKnockoutCheckboxes(containerId, round, limit) {
@@ -1820,7 +1742,7 @@ function changePassword() {
 // =============================================
 // UI HULPFUNCTIES
 // =============================================
-const viewMap = { ranglijst: 0, voorspel: 1, upload: 2, admin: 3 };
+const viewMap = { ranglijst: 0, voorspel: 1, admin: 2 };
 
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1837,28 +1759,15 @@ function showToast(msg, isError = false) {
   setTimeout(() => el.classList.remove('show', 'error'), 3200);
 }
 
-// Drag & drop upload
-const uploadArea = document.getElementById('upload-area');
-uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-uploadArea.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadArea.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file) handleCSVUpload({ target: { files: [file] } });
-});
-
 // =============================================
 // INIT
 // =============================================
 (async () => {
-  // Toon laad-indicator
   document.getElementById('leaderboard-body').innerHTML =
-    `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--fg-muted);letter-spacing:2px;font-family:'Barlow Condensed';text-transform:uppercase;font-size:13px">Verbinden met database...</td></tr>`;
+    `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--fg-muted);letter-spacing:2px;font-family:'Barlow Condensed';text-transform:uppercase;font-size:13px">Verbinden met database...</td></tr>`;
 
   await loadState();
   buildPredictForm();
-  buildCSVExample();
   renderLeaderboard();
 })();
 </script>
