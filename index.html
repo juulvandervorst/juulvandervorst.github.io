@@ -375,6 +375,25 @@
   .points-ref-item strong { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--gold); display: block; }
   .points-ref-item span { color: var(--fg-muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
 
+  /* ====== GROEPSSTAND ====== */
+  .stand-table { width: 100%; border-collapse: collapse; }
+  .stand-table th {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--fg-muted);
+    padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: center;
+  }
+  .stand-table th:first-child { text-align: left; }
+  .stand-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); font-size: 13px; text-align: center; transition: background 0.15s; }
+  .stand-table td:first-child { text-align: left; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+  .stand-table tr:last-child td { border-bottom: none; }
+  .stand-table tr.through td { background: rgba(0,61,165,0.1); }
+  .stand-table tr.through-third td { background: rgba(245,166,35,0.07); }
+  .stand-pts { font-family: 'Bebas Neue', cursive; font-size: 20px; color: var(--gold); }
+  .stand-sep { border-top: 2px dashed var(--accent); opacity: 0.4; }
+  .stand-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 5px; border-radius: 2px; vertical-align: middle; margin-left: 4px; }
+  .stand-badge-direct { background: rgba(0,61,165,0.25); color: var(--accent); border: 1px solid rgba(0,61,165,0.4); }
+  .stand-badge-third  { background: rgba(245,166,35,0.2); color: var(--gold); border: 1px solid rgba(245,166,35,0.4); }
+
   /* ====== ADMIN PW CHANGE ====== */
   #admin-pw-change { display: none; }
 </style>
@@ -453,6 +472,7 @@
       <div class="points-ref">
         <div class="points-ref-item"><strong>3</strong><span>Juiste uitslag (W/G/V)</span></div>
         <div class="points-ref-item"><strong>6</strong><span>Exacte score</span></div>
+        <div class="points-ref-item"><strong>5</strong><span>Team naar R32</span></div>
         <div class="points-ref-item"><strong>10</strong><span>Team naar R16</span></div>
         <div class="points-ref-item"><strong>15</strong><span>Team naar KW</span></div>
         <div class="points-ref-item"><strong>20</strong><span>Team naar HF</span></div>
@@ -479,9 +499,24 @@
       <div id="group-tab-contents"></div>
     </div>
 
+    <!-- Virtuele groepsstand -->
+    <div class="card" id="card-groepsstand">
+      <div class="card-title">Virtuele Groepsstand</div>
+      <p style="font-size:12px;color:var(--fg-muted);margin-bottom:18px;letter-spacing:0.5px">Bijgewerkt op basis van jouw ingevulde scores. De top-2 per groep gaat automatisch door.</p>
+      <div class="tabs" id="stand-tabs"></div>
+      <div id="stand-contents"></div>
+    </div>
+
     <!-- Knock-out -->
     <div class="card">
       <div class="card-title">Knock-outfase — Welke teams gaan door?</div>
+
+      <div class="knockout-section">
+        <div class="knockout-round-title">Ronde van 32 — Kies 32 teams (5 ptn per team)</div>
+        <p style="font-size:12px;color:var(--fg-muted);margin-bottom:12px;letter-spacing:0.5px">De 24 groepswinnaar/runners-up gaan automatisch door, plus de 8 beste nummers drie. Kies welke 32 teams jij verwacht in de Ronde van 32.</p>
+        <div class="team-checkboxes" id="r32-picks"></div>
+        <p id="r32-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 32 geselecteerd</p>
+      </div>
 
       <div class="knockout-section">
         <div class="knockout-round-title">Ronde van 16 — Kies 16 teams (10 ptn per team)</div>
@@ -585,6 +620,11 @@
 
       <div class="card">
         <div class="card-title">Knock-out Uitslagen</div>
+
+        <div style="margin-bottom:20px">
+          <p class="knockout-round-title">Werkelijke teams in R32</p>
+          <div class="team-checkboxes" id="admin-r32"></div>
+        </div>
 
         <div style="margin-bottom:20px">
           <p class="knockout-round-title">Werkelijke teams in R16</p>
@@ -777,11 +817,11 @@ const ALL_TEAMS = Object.values(GROUPS).flatMap(g => g.teams).sort((a,b) => a.lo
 
 const POINTS = {
   correct_result: 3, exact_score: 6,
-  r16: 10, qf: 15, sf: 20, final: 25, champion: 30,
+  r32: 5, r16: 10, qf: 15, sf: 20, final: 25, champion: 30,
   top_scorer: 25, first_scorer: 15, last_scorer: 20,
   bonus_8: 10, bonus_16: 25, bonus_24: 50
 };
-const LIMITS = { r16: 16, qf: 8, sf: 4, final: 2 };
+const LIMITS = { r32: 32, r16: 16, qf: 8, sf: 4, final: 2 };
 
 // =============================================
 // SUPABASE CONFIGURATIE
@@ -832,7 +872,7 @@ async function loadState() {
       name: r.name,
       email: r.email || '',
       scores: r.scores || {},
-      knockout: r.knockout || { r16:[], qf:[], sf:[], final:[] },
+      knockout: r.knockout || { r32:[], r16:[], qf:[], sf:[], final:[] },
       champion: r.champion || '',
       top_scorer: r.top_scorer || '',
       first_scorer: r.first_scorer || '',
@@ -895,7 +935,7 @@ async function saveResults() {
       results.matches[key] = { a: va, b: vb, played };
     }
   }
-  const rounds = ['r16','qf','sf','final'];
+  const rounds = ['r32','r16','qf','sf','final'];
   for (const round of rounds) {
     results[round] = [...document.querySelectorAll(`#admin-${round} .team-check.selected`)].map(el => el.querySelector('input').value);
   }
@@ -1005,7 +1045,7 @@ function scoreParticipant(p) {
     bonusLabel = `8–15 goede uitslagen (${correctGroupCount})`;
   }
 
-  const rounds = [['r16', POINTS.r16], ['qf', POINTS.qf], ['sf', POINTS.sf], ['final', POINTS.final]];
+  const rounds = [['r32', POINTS.r32], ['r16', POINTS.r16], ['qf', POINTS.qf], ['sf', POINTS.sf], ['final', POINTS.final]];
   for (const [round, pts] of rounds) {
     const actual = new Set(results[round] || []);
     const picked = p.knockout?.[round] || [];
@@ -1083,7 +1123,7 @@ function toggleParticipantDetail(name) {
     </div>
   `).join('');
 
-  const roundLabels = { r16: 'R16', qf: 'KW', sf: 'HF', final: 'Finale' };
+  const roundLabels = { r32: 'R32', r16: 'R16', qf: 'KW', sf: 'HF', final: 'Finale' };
   const knockRows = Object.entries(roundLabels).map(([k, label]) => {
     const picked = p.knockout?.[k] || [];
     const actual = new Set(results[k] || []);
@@ -1123,6 +1163,143 @@ function toggleParticipantDetail(name) {
 }
 
 // =============================================
+// VIRTUELE GROEPSSTAND
+// =============================================
+function calcGroupStanding(group) {
+  const gdata = GROUPS[group];
+  const stats = {};
+  for (const team of gdata.teams) {
+    stats[team] = { team, group, pts: 0, w: 0, g: 0, v: 0, dv: 0, dt: 0 };
+  }
+  for (const [a, b] of gdata.matches) {
+    const key = matchKey(group, a, b);
+    const va = parseInt(document.getElementById(`pred_${key}_a`)?.value);
+    const vb = parseInt(document.getElementById(`pred_${key}_b`)?.value);
+    if (isNaN(va) || isNaN(vb)) continue;
+    stats[a].dv += va; stats[a].dt += vb;
+    stats[b].dv += vb; stats[b].dt += va;
+    if (va > vb)      { stats[a].pts += 3; stats[a].w++; stats[b].v++; }
+    else if (va < vb) { stats[b].pts += 3; stats[b].w++; stats[a].v++; }
+    else              { stats[a].pts += 1; stats[b].pts += 1; stats[a].g++; stats[b].g++; }
+  }
+  return Object.values(stats).sort((x, y) => {
+    if (y.pts !== x.pts) return y.pts - x.pts;
+    if ((y.dv-y.dt) !== (x.dv-x.dt)) return (y.dv-y.dt) - (x.dv-x.dt);
+    return y.dv - x.dv;
+  });
+}
+
+// Bereken welke 8 nummers drie doorgaan op basis van ingevulde scores
+function getBest8ThirdPlace() {
+  const thirds = Object.keys(GROUPS).map(group => {
+    const standing = calcGroupStanding(group);
+    return { ...standing[2], group }; // nummer drie van elke groep
+  }).filter(t => t.pts > 0 || t.dv > 0 || t.dt > 0); // alleen als er scores zijn
+
+  thirds.sort((x, y) => {
+    if (y.pts !== x.pts) return y.pts - x.pts;
+    if ((y.dv-y.dt) !== (x.dv-x.dt)) return (y.dv-y.dt) - (x.dv-x.dt);
+    return y.dv - x.dv;
+  });
+
+  return new Set(thirds.slice(0, 8).map(t => t.team));
+}
+
+function buildStandingTabs() {
+  const tabsEl = document.getElementById('stand-tabs');
+  const contentsEl = document.getElementById('stand-contents');
+  if (!tabsEl) return;
+  tabsEl.innerHTML = '';
+  contentsEl.innerHTML = '';
+
+  Object.keys(GROUPS).forEach((group, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+    btn.textContent = `Groep ${group}`;
+    btn.id = `stand-tab-${group}`;
+    btn.onclick = () => {
+      document.querySelectorAll('#stand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#stand-contents .tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`stand-${group}`).classList.add('active');
+    };
+    tabsEl.appendChild(btn);
+
+    const div = document.createElement('div');
+    div.id = `stand-${group}`;
+    div.className = 'tab-content' + (idx === 0 ? ' active' : '');
+    contentsEl.appendChild(div);
+    renderGroupStanding(group);
+  });
+}
+
+function renderAllStandings() {
+  Object.keys(GROUPS).forEach(g => renderGroupStanding(g));
+}
+
+function renderGroupStanding(group) {
+  const div = document.getElementById(`stand-${group}`);
+  if (!div) return;
+  const rows = calcGroupStanding(group);
+  const best8 = getBest8ThirdPlace();
+  const gamesPlayed = GROUPS[group].matches.filter(([a, b]) => {
+    const key = matchKey(group, a, b);
+    const va = document.getElementById(`pred_${key}_a`)?.value;
+    const vb = document.getElementById(`pred_${key}_b`)?.value;
+    return va !== '' && vb !== '';
+  }).length;
+  const totalGames = GROUPS[group].matches.length;
+
+  div.innerHTML = `
+    <table class="stand-table">
+      <thead>
+        <tr>
+          <th style="text-align:left">#&nbsp;&nbsp;Team</th>
+          <th>G</th><th>W</th><th>Ge</th><th>V</th>
+          <th>DV</th><th>DT</th><th>DS</th>
+          <th>Ptn</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((r, i) => {
+          const isThrough = i < 2;
+          const isBest8Third = i === 2 && best8.has(r.team);
+          const ds = r.dv - r.dt;
+          let rowClass = '';
+          if (isThrough) rowClass = 'through';
+          else if (isBest8Third) rowClass = 'through-third';
+          let badge = '';
+          if (isThrough) badge = '<span class="stand-badge stand-badge-direct">door</span>';
+          else if (isBest8Third) badge = '<span class="stand-badge stand-badge-third">nr.3</span>';
+          return `
+          <tr class="${rowClass}">
+            <td><span style="color:var(--fg-muted);font-size:11px;margin-right:4px">${i+1}</span>${r.team.replace('*','')} ${badge}</td>
+            <td>${r.w + r.g + r.v}</td>
+            <td>${r.w}</td><td>${r.g}</td><td>${r.v}</td>
+            <td>${r.dv}</td><td>${r.dt}</td>
+            <td style="color:${ds>0?'var(--gold)':ds<0?'var(--red)':'var(--fg-muted)'}">
+              ${ds > 0 ? '+' : ''}${ds}
+            </td>
+            <td class="stand-pts">${r.pts}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <div class="stand-sep" style="margin:10px 0 6px"></div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;color:var(--fg-muted)">${gamesPlayed}/${totalGames} wedstrijden ingevuld</span>
+      <span style="font-size:11px;color:var(--fg-muted);display:flex;align-items:center;gap:5px"><span class="stand-badge stand-badge-direct">door</span> automatisch door</span>
+      <span style="font-size:11px;color:var(--fg-muted);display:flex;align-items:center;gap:5px"><span class="stand-badge stand-badge-third">nr.3</span> beste 8 nummers drie</span>
+    </div>
+  `;
+}
+
+function updateStanding(group) {
+  // Re-render all groups because best-8 ranking is cross-group
+  renderAllStandings();
+}
+
+// =============================================
 // VOORSPELFORMULIER
 // =============================================
 function buildPredictForm() {
@@ -1135,7 +1312,16 @@ function buildPredictForm() {
     const btn = document.createElement('button');
     btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
     btn.textContent = `Groep ${group}`;
-    btn.onclick = () => switchGroupTab(group, 'pred');
+    btn.onclick = () => {
+      switchGroupTab(group, 'pred');
+      // Sync standing tab to the same group
+      document.querySelectorAll('#stand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#stand-contents .tab-content').forEach(c => c.classList.remove('active'));
+      const st = document.getElementById(`stand-tab-${group}`);
+      const sc = document.getElementById(`stand-${group}`);
+      if (st) st.classList.add('active');
+      if (sc) sc.classList.add('active');
+    };
     tabsEl.appendChild(btn);
 
     const div = document.createElement('div');
@@ -1156,9 +1342,9 @@ function buildPredictForm() {
                 <div class="team-name right${bIsPlaceholder ? ' placeholder-team' : ''}">${b.replace('*','')}</div>
               </div>
               <div class="score-inputs">
-                <input type="number" min="0" max="20" id="pred_${key}_a" placeholder="—">
+                <input type="number" min="0" max="20" id="pred_${key}_a" placeholder="—" oninput="updateStanding('${group}')">
                 <div class="score-sep">—</div>
-                <input type="number" min="0" max="20" id="pred_${key}_b" placeholder="—">
+                <input type="number" min="0" max="20" id="pred_${key}_b" placeholder="—" oninput="updateStanding('${group}')">
               </div>
             </div>
           `;
@@ -1168,10 +1354,12 @@ function buildPredictForm() {
     contentsEl.appendChild(div);
   });
 
+  buildKnockoutCheckboxes('r32-picks', 'r32', LIMITS.r32);
   buildKnockoutCheckboxes('r16-picks', 'r16', LIMITS.r16);
   buildKnockoutCheckboxes('qf-picks', 'qf', LIMITS.qf);
   buildKnockoutCheckboxes('sf-picks', 'sf', LIMITS.sf);
   buildKnockoutCheckboxes('final-picks', 'final', LIMITS.final);
+  buildStandingTabs();
 
   const sel = document.getElementById('pick-champion');
   sel.innerHTML = '<option value="">— Selecteer land —</option>' + ALL_TEAMS.map(t => `<option value="${t}">${t}</option>`).join('');
@@ -1254,6 +1442,7 @@ async function submitPredictions() {
   }
 
   const knockout = {
+    r32: [...document.querySelectorAll('#r32-picks .team-check.selected')].map(el => el.querySelector('input').value),
     r16: [...document.querySelectorAll('#r16-picks .team-check.selected')].map(el => el.querySelector('input').value),
     qf: [...document.querySelectorAll('#qf-picks .team-check.selected')].map(el => el.querySelector('input').value),
     sf: [...document.querySelectorAll('#sf-picks .team-check.selected')].map(el => el.querySelector('input').value),
@@ -1341,6 +1530,7 @@ function buildAdminPanel() {
     contentsEl.appendChild(div);
   });
 
+  buildAdminKnockoutCheckboxes('admin-r32', 'r32', LIMITS.r32);
   buildAdminKnockoutCheckboxes('admin-r16', 'r16', LIMITS.r16);
   buildAdminKnockoutCheckboxes('admin-qf', 'qf', LIMITS.qf);
   buildAdminKnockoutCheckboxes('admin-sf', 'sf', LIMITS.sf);
