@@ -1156,9 +1156,9 @@ function buildPredictForm() {
                 <div class="team-name right${bIsPlaceholder ? ' placeholder-team' : ''}">${b.replace('*','')}</div>
               </div>
               <div class="score-inputs">
-                <input type="number" min="0" max="20" id="pred_${key}_a" placeholder="0">
+                <input type="number" min="0" max="20" id="pred_${key}_a" placeholder="—">
                 <div class="score-sep">—</div>
-                <input type="number" min="0" max="20" id="pred_${key}_b" placeholder="0">
+                <input type="number" min="0" max="20" id="pred_${key}_b" placeholder="—">
               </div>
             </div>
           `;
@@ -1232,13 +1232,25 @@ async function submitPredictions() {
   }
 
   const scores = {};
+  const missing = [];
   for (const [group, gdata] of Object.entries(GROUPS)) {
     for (const [a, b] of gdata.matches) {
       const key = matchKey(group, a, b);
       const va = document.getElementById(`pred_${key}_a`)?.value;
       const vb = document.getElementById(`pred_${key}_b`)?.value;
-      if (va !== '' && vb !== '') scores[key] = { a: va, b: vb };
+      if (va === '' || vb === '') {
+        missing.push(`Groep ${group}: ${a} vs ${b}`);
+      } else {
+        scores[key] = { a: va, b: vb };
+      }
     }
+  }
+  if (missing.length > 0) {
+    showToast(`Nog ${missing.length} wedstrijd${missing.length === 1 ? '' : 'en'} niet ingevuld`, true);
+    // Switch to the tab of the first missing match
+    const firstGroup = missing[0].match(/Groep ([A-Z]):/)?.[1];
+    if (firstGroup) switchGroupTab(firstGroup, 'pred');
+    return;
   }
 
   const knockout = {
