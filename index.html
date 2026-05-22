@@ -375,6 +375,64 @@
   .points-ref-item strong { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--gold); display: block; }
   .points-ref-item span { color: var(--fg-muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
 
+  /* ====== AANKONDIGINGEN ====== */
+  .announcement-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    margin-bottom: 14px;
+  }
+  .announcement-date {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--fg-muted);
+    margin-bottom: 6px;
+  }
+  .announcement-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 700; letter-spacing: 1px;
+    color: var(--fg); margin-bottom: 10px;
+  }
+  .announcement-body {
+    font-size: 14px; line-height: 1.7; color: var(--fg-muted);
+  }
+
+  /* ====== DETAIL MATCH ROWS ====== */
+  .detail-match-header {
+    display: grid;
+    grid-template-columns: 2fr 60px 80px 80px 100px 44px;
+    gap: 6px; padding: 4px 8px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--fg-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-match-row {
+    display: grid;
+    grid-template-columns: 2fr 60px 80px 80px 100px 44px;
+    gap: 6px; align-items: center;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .detail-match-row:last-child { border-bottom: none; }
+  .detail-match-row:hover { background: var(--row-hover); }
+  .detail-match-teams {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .detail-match-date { color: var(--fg-muted); font-size: 11px; }
+  .detail-match-pred { font-family: 'Bebas Neue', cursive; font-size: 16px; letter-spacing: 1px; }
+  .detail-match-actual { font-family: 'Bebas Neue', cursive; font-size: 16px; letter-spacing: 1px; }
+  .detail-match-result { font-size: 11px; letter-spacing: 0.5px; }
+  @media (max-width: 600px) {
+    .detail-match-header, .detail-match-row {
+      grid-template-columns: 1fr 50px 60px 44px;
+    }
+    .detail-match-date, .detail-match-result { display: none; }
+  }
+
   /* ====== BRACKET ====== */
   .bracket-round-title {
     font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
@@ -449,15 +507,29 @@
 </header>
 
 <nav>
-  <button class="nav-btn active" onclick="showView('ranglijst')">Ranglijst</button>
+  <button class="nav-btn active" onclick="showView('aankondigingen')">Nieuws</button>
+  <button class="nav-btn" onclick="showView('ranglijst')">Ranglijst</button>
   <button class="nav-btn" onclick="showView('voorspel')">Voorspellingen</button>
   <button class="nav-btn" onclick="showView('admin')">Admin</button>
 </nav>
 
 <main>
 
+  <!-- ======= AANKONDIGINGEN ======= -->
+  <div id="view-aankondigingen" class="view active">
+    <div class="section-title">Nieuws</div>
+    <p class="section-desc">Aankondigingen en updates van de poolbeheerder</p>
+    <div id="announcements-list">
+      <div class="empty-state">
+        <span class="empty-state-icon">📢</span>
+        <div class="empty-state-text">Nog geen aankondigingen</div>
+        <p style="font-size:12px;color:var(--fg-muted)">De poolbeheerder plaatst hier updates en mededelingen</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ======= RANGLIJST ======= -->
-  <div id="view-ranglijst" class="view active">
+  <div id="view-ranglijst" class="view">
     <div class="section-title">Ranglijst</div>
     <p class="section-desc">Live standen — bijgewerkt zodra uitslagen bekend zijn</p>
 
@@ -620,6 +692,28 @@
         <button class="btn btn-secondary" onclick="exportData()">📤 Exporteer Data</button>
         <button class="btn btn-danger" onclick="clearAllParticipants()">🗑 Deelnemers Wissen</button>
         <button class="btn btn-secondary" onclick="showAdminPasswordChange()">🔑 Wachtwoord Wijzigen</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Aankondigingen Beheren</div>
+        <p style="font-size:13px;color:var(--fg-muted);margin-bottom:16px">Aankondigingen zijn zichtbaar voor alle deelnemers op de Nieuws-pagina.</p>
+        <div class="form-group">
+          <label>Titel</label>
+          <input type="text" id="ann-title" placeholder="bijv. De pool is geopend!">
+        </div>
+        <div class="form-group">
+          <label>Bericht</label>
+          <textarea id="ann-body" rows="4"
+            style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-bottom:2px solid var(--border);
+                   color:var(--fg);padding:10px 14px;font-family:'Barlow',sans-serif;font-size:14px;
+                   outline:none;resize:vertical;transition:border-color 0.2s"
+            placeholder="Schrijf je bericht hier..."
+            onfocus="this.style.borderBottomColor='var(--accent)'"
+            onblur="this.style.borderBottomColor='var(--border)'"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="addAnnouncement()" style="margin-bottom:20px">Plaatsen</button>
+
+        <div id="admin-announcements-list"></div>
       </div>
 
       <div id="admin-pw-change" class="card">
@@ -1115,46 +1209,36 @@ function renderLeaderboard() {
 }
 
 function toggleParticipantDetail(name) {
+  const panel = document.getElementById('participant-detail-panel');
+  // Toggle closed if same participant clicked again
+  if (panel.dataset.open === name && panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    panel.dataset.open = '';
+    return;
+  }
+  panel.dataset.open = name;
+
   const p = participants.find(x => x.name === name);
   if (!p) return;
-  const panel = document.getElementById('participant-detail-panel');
   const scored = scoreParticipant(p);
 
-  const matchRows = scored.breakdown.map(b => `
-    <div class="match-result-row">
-      <span style="color:var(--fg-muted);font-size:12px">${b.match}</span>
-      <span style="font-size:11px;color:var(--fg-muted)">Voorsp: <strong style="color:var(--fg)">${b.predicted}</strong></span>
-      <span style="font-size:11px;color:var(--fg-muted)">Echt: <strong style="color:var(--fg)">${b.actual}</strong></span>
-      <span style="font-size:11px;color:var(--fg-muted)">${b.reason}</span>
-      <span class="pts-badge ${b.pts === 0 ? 'zero' : ''}">${b.pts}</span>
-    </div>
-  `).join('');
-
-  const ROUND_LABELS_DETAIL = { r32: 'R32', r16: 'R16', qf: 'KW', sf: 'HF', final: 'Finale' };
-  const knockRows = Object.entries(ROUND_LABELS_DETAIL).map(([k, label]) => {
-    const pickedTeams = teamsInBracketRound(p.knockout?.[k]);
-    const actualTeams = teamsInBracketRound(results.bracket?.[k]);
-    const hasActual = actualTeams.size > 0;
-    return [...pickedTeams].filter(t => t).map(team => `
-      <div class="match-result-row">
-        <span style="color:var(--fg-muted);font-size:12px">${label}: ${team}</span>
-        <span></span><span></span>
-        <span style="font-size:11px;color:${actualTeams.has(team) ? 'var(--neon)' : 'var(--fg-muted)'}">${actualTeams.has(team) ? '✓ Correct' : hasActual ? '✗ Fout' : 'Afwachten'}</span>
-        <span class="pts-badge ${actualTeams.has(team) ? '' : 'zero'}">${actualTeams.has(team) ? POINTS[k] : 0}</span>
-      </div>
-    `).join('');
-  }).join('');
-
-  panel.innerHTML = `
+  // ── Score header ──
+  const scoreHeader = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div class="card-title" style="margin:0">Voorspellingen van ${p.name}</div>
-      <button class="btn btn-secondary" style="padding:6px 14px;font-size:11px" onclick="document.getElementById('participant-detail-panel').classList.remove('open')">Sluiten</button>
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:11px"
+        onclick="document.getElementById('participant-detail-panel').classList.remove('open');
+                 document.getElementById('participant-detail-panel').dataset.open=''">Sluiten</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
       <div style="background:var(--detail-score-bg);padding:12px;border:1px solid var(--border)">
-        <strong style="font-family:'Bebas Neue';font-size:28px;color:var(--neon)">${scored.total}</strong>
+        <strong style="font-family:'Bebas Neue';font-size:28px;color:var(--accent)">${scored.total}</strong>
         <div style="font-size:11px;color:var(--fg-muted);letter-spacing:1px;text-transform:uppercase">Totaal punten</div>
-        ${scored.bonusPts > 0 ? `<div style="font-size:11px;color:var(--gold);margin-top:6px">🎯 +${scored.bonusPts} bonus — ${scored.bonusLabel}</div>` : scored.correctGroupCount > 0 ? `<div style="font-size:11px;color:var(--fg-muted);margin-top:6px">${scored.correctGroupCount} goede groepsuitslagen</div>` : ''}
+        ${scored.bonusPts > 0
+          ? `<div style="font-size:11px;color:var(--gold);margin-top:6px">🎯 +${scored.bonusPts} bonus — ${scored.bonusLabel}</div>`
+          : scored.correctGroupCount > 0
+          ? `<div style="font-size:11px;color:var(--fg-muted);margin-top:6px">${scored.correctGroupCount} goede groepsuitslagen</div>`
+          : ''}
       </div>
       <div style="background:var(--detail-meta-bg);padding:12px;border:1px solid var(--border)">
         <div style="font-size:12px;color:var(--fg-muted)">🏆 Kampioen: <strong style="color:var(--fg)">${p.champion || '—'}</strong></div>
@@ -1162,10 +1246,103 @@ function toggleParticipantDetail(name) {
         <div style="font-size:12px;color:var(--fg-muted);margin-top:4px">🥇 Eerste doelpunt: <strong style="color:var(--fg)">${p.first_scorer || '—'}</strong></div>
         <div style="font-size:12px;color:var(--fg-muted);margin-top:4px">🏁 Laatste doelpunt: <strong style="color:var(--fg)">${p.last_scorer || '—'}</strong></div>
       </div>
-    </div>
-    ${matchRows ? `<div style="margin-bottom:12px">${matchRows}</div>` : ''}
-    ${knockRows}
-  `;
+    </div>`;
+
+  // ── Groepsfase: alle wedstrijden per groep ──
+  const groupSection = Object.entries(GROUPS).map(([group, gdata]) => {
+    const rows = gdata.matches.map(([a, b, date]) => {
+      const key = matchKey(group, a, b);
+      const pred = p.scores?.[key];
+      const actual = results.matches?.[key];
+      const hasPred = pred && pred.a !== '' && pred.b !== '';
+      const hasActual = actual && actual.played;
+
+      let predStr = hasPred ? `${pred.a} – ${pred.b}` : '—';
+      let actualStr = hasActual ? `${actual.a} – ${actual.b}` : '—';
+      let pts = 0, resultLabel = '', resultColor = 'var(--fg-muted)';
+
+      if (hasPred && hasActual) {
+        const pA = parseInt(pred.a), pB = parseInt(pred.b);
+        const rA = parseInt(actual.a), rB = parseInt(actual.b);
+        if (pA === rA && pB === rB) {
+          pts = POINTS.exact_score; resultLabel = 'Exact'; resultColor = 'var(--gold)';
+        } else if (Math.sign(pA-pB) === Math.sign(rA-rB)) {
+          pts = POINTS.correct_result; resultLabel = 'Uitslag goed'; resultColor = 'var(--accent)';
+        } else {
+          resultLabel = 'Fout'; resultColor = 'var(--fg-muted)';
+        }
+      } else if (hasPred) {
+        resultLabel = 'Afwachten'; resultColor = 'var(--fg-muted)';
+      }
+
+      return `<div class="detail-match-row">
+        <span class="detail-match-teams">${a.replace('*','')} vs ${b.replace('*','')}</span>
+        <span class="detail-match-date">${date}</span>
+        <span class="detail-match-pred">${predStr}</span>
+        <span class="detail-match-actual" style="color:var(--fg-muted)">${actualStr}</span>
+        <span class="detail-match-result" style="color:${resultColor}">${resultLabel}</span>
+        <span class="pts-badge ${pts === 0 ? 'zero' : ''}">${pts}</span>
+      </div>`;
+    }).join('');
+
+    return `
+      <div style="margin-bottom:18px">
+        <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:3px;
+                    text-transform:uppercase;color:var(--gold);margin-bottom:8px;opacity:0.8">
+          Groep ${group}
+        </div>
+        <div class="detail-match-header">
+          <span>Wedstrijd</span><span>Datum</span><span>Voorspeld</span><span>Uitslag</span><span>Resultaat</span><span>Ptn</span>
+        </div>
+        ${rows}
+      </div>`;
+  }).join('');
+
+  // ── Knock-out bracket ──
+  const ROUND_LABELS_DETAIL = { r32: 'R32', r16: 'R16', qf: 'KW', sf: 'HF', final: 'Finale' };
+  const knockSection = Object.entries(ROUND_LABELS_DETAIL).map(([k, label]) => {
+    const bracketSlots = BRACKET_SLOTS[k] || [];
+    const pickedRound = p.knockout?.[k] || {};
+    const actualTeams = teamsInBracketRound(results.bracket?.[k]);
+    const hasActual = actualTeams.size > 0;
+
+    const rows = bracketSlots.map(([slotLabel], i) => {
+      const teamA = pickedRound[`${i}_a`] || '—';
+      const teamB = pickedRound[`${i}_b`] || '—';
+      const aCorrect = hasActual && teamA !== '—' && actualTeams.has(teamA);
+      const bCorrect = hasActual && teamB !== '—' && actualTeams.has(teamB);
+      const pts = (aCorrect ? POINTS[k] : 0) + (bCorrect ? POINTS[k] : 0);
+
+      return `<div class="detail-match-row">
+        <span class="detail-match-teams" style="font-size:11px;color:var(--fg-muted)">${slotLabel}</span>
+        <span></span>
+        <span style="font-size:12px">
+          <span style="color:${aCorrect ? 'var(--gold)' : 'var(--fg)'}">${teamA}</span>
+          <span style="color:var(--fg-muted)"> vs </span>
+          <span style="color:${bCorrect ? 'var(--gold)' : 'var(--fg)'}">${teamB}</span>
+        </span>
+        <span></span>
+        <span style="font-size:11px;color:var(--fg-muted)">${!hasActual ? 'Afwachten' : (aCorrect||bCorrect) ? '✓' : ''}</span>
+        <span class="pts-badge ${pts === 0 ? 'zero' : ''}">${pts}</span>
+      </div>`;
+    }).join('');
+
+    return `
+      <div style="margin-bottom:18px">
+        <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:3px;
+                    text-transform:uppercase;color:var(--gold);margin-bottom:8px;opacity:0.8">${label}</div>
+        ${rows}
+      </div>`;
+  }).join('');
+
+  panel.innerHTML = scoreHeader +
+    `<div style="font-family:'Barlow Condensed';font-size:13px;font-weight:700;letter-spacing:2px;
+                 text-transform:uppercase;color:var(--fg-muted);margin-bottom:12px">Groepsfase</div>` +
+    groupSection +
+    `<div style="font-family:'Barlow Condensed';font-size:13px;font-weight:700;letter-spacing:2px;
+                 text-transform:uppercase;color:var(--fg-muted);margin:20px 0 12px">Knock-outfase</div>` +
+    knockSection;
+
   panel.classList.add('open');
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -1626,9 +1803,116 @@ function buildAdminPanel() {
   document.getElementById('admin-topscorer').value = results.top_scorer || '';
   document.getElementById('admin-first-scorer').value = results.first_scorer || '';
   document.getElementById('admin-last-scorer').value = results.last_scorer || '';
+  renderAdminAnnouncements();
 }
 
 // buildAdminKnockoutCheckboxes en toggleAdminKnock vervangen door bracket dropdowns
+
+// =============================================
+// AANKONDIGINGEN
+// =============================================
+let announcements = []; // { id, title, body, created }
+
+async function loadAnnouncements() {
+  try {
+    const rows = await sb('announcements?select=*&order=created_at.desc');
+    announcements = (rows || []).map(r => ({
+      id: r.id, title: r.title, body: r.body,
+      created: r.created_at
+    }));
+  } catch(e) {
+    // Fallback: localStorage
+    try { announcements = JSON.parse(localStorage.getItem('wkf_announcements') || '[]'); } catch(e2) {}
+  }
+  renderAnnouncements();
+  if (adminUnlocked) renderAdminAnnouncements();
+}
+
+async function addAnnouncement() {
+  const title = document.getElementById('ann-title').value.trim();
+  const body = document.getElementById('ann-body').value.trim();
+  if (!title) { showToast('Vul een titel in', true); return; }
+  if (!body)  { showToast('Vul een bericht in', true); return; }
+
+  const ann = { title, body, created: new Date().toISOString() };
+  try {
+    const rows = await sb('announcements', {
+      method: 'POST',
+      body: JSON.stringify({ title, body, created_at: ann.created })
+    });
+    if (rows && rows[0]) ann.id = rows[0].id;
+  } catch(e) {
+    // Fallback localStorage
+    ann.id = Date.now();
+    announcements.unshift(ann);
+    localStorage.setItem('wkf_announcements', JSON.stringify(announcements));
+    renderAnnouncements();
+    renderAdminAnnouncements();
+    document.getElementById('ann-title').value = '';
+    document.getElementById('ann-body').value = '';
+    showToast('Aankondiging geplaatst ✓');
+    return;
+  }
+  announcements.unshift(ann);
+  renderAnnouncements();
+  renderAdminAnnouncements();
+  document.getElementById('ann-title').value = '';
+  document.getElementById('ann-body').value = '';
+  showToast('Aankondiging geplaatst ✓');
+}
+
+async function deleteAnnouncement(id) {
+  if (!confirm('Deze aankondiging verwijderen?')) return;
+  try {
+    await sb(`announcements?id=eq.${id}`, { method: 'DELETE' });
+  } catch(e) { /* fallback */ }
+  announcements = announcements.filter(a => a.id !== id);
+  localStorage.setItem('wkf_announcements', JSON.stringify(announcements));
+  renderAnnouncements();
+  renderAdminAnnouncements();
+}
+
+function renderAnnouncements() {
+  const el = document.getElementById('announcements-list');
+  if (!el) return;
+  if (announcements.length === 0) {
+    el.innerHTML = `<div class="empty-state">
+      <span class="empty-state-icon">📢</span>
+      <div class="empty-state-text">Nog geen aankondigingen</div>
+      <p style="font-size:12px;color:var(--fg-muted)">De poolbeheerder plaatst hier updates en mededelingen</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = announcements.map(a => {
+    const date = new Date(a.created).toLocaleDateString('nl-NL', { day:'numeric', month:'long', year:'numeric' });
+    return `<div class="announcement-card">
+      <div class="announcement-date">${date}</div>
+      <div class="announcement-title">${a.title}</div>
+      <div class="announcement-body">${a.body.replace(/\n/g,'<br>')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderAdminAnnouncements() {
+  const el = document.getElementById('admin-announcements-list');
+  if (!el) return;
+  if (announcements.length === 0) {
+    el.innerHTML = `<p style="font-size:13px;color:var(--fg-muted)">Nog geen aankondigingen geplaatst.</p>`;
+    return;
+  }
+  el.innerHTML = `<div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--fg-muted);margin-bottom:10px">Geplaatste aankondigingen</div>` +
+    announcements.map(a => {
+      const date = new Date(a.created).toLocaleDateString('nl-NL', { day:'numeric', month:'long' });
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:12px">
+        <div>
+          <div style="font-weight:600;font-size:14px">${a.title}</div>
+          <div style="font-size:12px;color:var(--fg-muted);margin-top:2px">${date}</div>
+        </div>
+        <button class="btn btn-danger" style="padding:6px 12px;font-size:11px;flex-shrink:0"
+          onclick="deleteAnnouncement(${typeof a.id === 'string' ? "'" + a.id + "'" : a.id})">Verwijderen</button>
+      </div>`;
+    }).join('');
+}
 
 function exportData() {
   const data = { participants, results, exported: new Date().toISOString() };
@@ -1655,7 +1939,7 @@ function changePassword() {
 // =============================================
 // UI HULPFUNCTIES
 // =============================================
-const viewMap = { ranglijst: 0, voorspel: 1, admin: 2 };
+const viewMap = { aankondigingen: 0, ranglijst: 1, voorspel: 2, admin: 3 };
 
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1680,6 +1964,7 @@ function showToast(msg, isError = false) {
     `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--fg-muted);letter-spacing:2px;font-family:'Barlow Condensed';text-transform:uppercase;font-size:13px">Verbinden met database...</td></tr>`;
 
   await loadState();
+  await loadAnnouncements();
   buildPredictForm();
   renderLeaderboard();
 })();
