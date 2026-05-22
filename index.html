@@ -360,6 +360,7 @@
 
   .pts-badge { font-family: 'Bebas Neue', cursive; font-size: 16px; padding: 2px 8px; background: var(--pts-bg); color: var(--gold); min-width: 40px; text-align: center; }
   .pts-badge.zero { background: var(--pts-zero-bg); color: var(--fg-muted); }
+  .pts-badge.exact { background: rgba(34,197,94,0.18); color: #22c55e; }
 
   /* ====== EMPTY STATE ====== */
   .empty-state { text-align: center; padding: 60px 20px; color: var(--fg-muted); }
@@ -374,6 +375,80 @@
   .points-ref-item { background: var(--pts-ref-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 10px 14px; font-size: 12px; }
   .points-ref-item strong { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--gold); display: block; }
   .points-ref-item span { color: var(--fg-muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ====== VOLGENDE WEDSTRIJD ====== */
+  .next-match-card { margin-bottom: 20px; }
+
+  .next-match-fixture {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0 24px;
+  }
+
+  .next-match-team {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(22px, 4vw, 36px);
+    letter-spacing: 2px;
+    color: var(--fg);
+    line-height: 1.1;
+  }
+  .next-match-team.right { text-align: right; }
+
+  .next-match-vs {
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+
+  .next-match-date {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--fg-muted);
+    margin-bottom: 4px;
+  }
+
+  .next-match-pred-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--fg-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 16px; margin-bottom: 12px;
+  }
+
+  .next-match-pred-row {
+    display: grid;
+    grid-template-columns: 24px 56px 1fr 60px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .next-match-medal { font-size: 16px; text-align: center; }
+
+  .next-match-score {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px; letter-spacing: 2px; color: var(--fg);
+  }
+
+  .next-match-bar-wrap {
+    height: 6px; background: var(--border);
+    border-radius: 3px; overflow: hidden;
+  }
+
+  .next-match-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    min-width: 4px;
+  }
+
+  .next-match-pct {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 600; color: var(--fg);
+    text-align: right; white-space: nowrap;
+  }
 
   /* ====== AANKONDIGINGEN ====== */
   .announcement-card {
@@ -519,6 +594,9 @@
   <div id="view-aankondigingen" class="view active">
     <div class="section-title">Nieuws</div>
     <p class="section-desc">Aankondigingen en updates van de poolbeheerder</p>
+
+    <div id="next-match-block"></div>
+
     <div id="announcements-list">
       <div class="empty-state">
         <span class="empty-state-icon">📢</span>
@@ -1281,7 +1359,7 @@ function toggleParticipantDetail(name) {
         <span class="detail-match-pred">${predStr}</span>
         <span class="detail-match-actual" style="color:var(--fg-muted)">${actualStr}</span>
         <span class="detail-match-result" style="color:${resultColor}">${resultLabel}</span>
-        <span class="pts-badge ${pts === 0 ? 'zero' : ''}">${pts}</span>
+        <span class="pts-badge ${pts === 0 ? 'zero' : pts === POINTS.exact_score ? 'exact' : ''}">${pts}</span>
       </div>`;
     }).join('');
 
@@ -1323,7 +1401,7 @@ function toggleParticipantDetail(name) {
         </span>
         <span></span>
         <span style="font-size:11px;color:var(--fg-muted)">${!hasActual ? 'Afwachten' : (aCorrect||bCorrect) ? '✓' : ''}</span>
-        <span class="pts-badge ${pts === 0 ? 'zero' : ''}">${pts}</span>
+        <span class="pts-badge ${pts === 0 ? 'zero' : pts === POINTS.exact_score ? 'exact' : ''}">${pts}</span>
       </div>`;
     }).join('');
 
@@ -1872,6 +1950,97 @@ async function deleteAnnouncement(id) {
   renderAdminAnnouncements();
 }
 
+// =============================================
+// VOLGENDE WEDSTRIJD
+// =============================================
+function getNextMatch() {
+  // Build a flat list of all group matches in date order
+  // Date format: "11 jun" — convert to sortable number (day + month offset)
+  const MONTH_ORDER = { 'jun': 6, 'jul': 7 };
+
+  const all = [];
+  for (const [group, gdata] of Object.entries(GROUPS)) {
+    for (const [a, b, date] of gdata.matches) {
+      const key = matchKey(group, a, b);
+      const played = results.matches?.[key]?.played || false;
+      const [day, mon] = date.split(' ');
+      const sortKey = (MONTH_ORDER[mon] || 6) * 100 + parseInt(day);
+      all.push({ group, a, b, date, key, played, sortKey });
+    }
+  }
+
+  all.sort((x, y) => x.sortKey - y.sortKey);
+
+  // Return first unplayed match
+  return all.find(m => !m.played) || null;
+}
+
+function getTopPredictions(matchKey, n = 3) {
+  const counts = {};
+  for (const p of participants) {
+    const pred = p.scores?.[matchKey];
+    if (!pred || pred.a === '' || pred.b === '') continue;
+    const label = `${pred.a}–${pred.b}`;
+    counts[label] = (counts[label] || 0) + 1;
+  }
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([score, count]) => ({ score, count }));
+}
+
+function renderNextMatch() {
+  const el = document.getElementById('next-match-block');
+  if (!el) return;
+
+  const match = getNextMatch();
+  if (!match) {
+    el.innerHTML = '';
+    return;
+  }
+
+  const total = participants.length;
+  const preds = getTopPredictions(match.key, 3);
+  const filled = participants.filter(p => {
+    const pred = p.scores?.[match.key];
+    return pred && pred.a !== '' && pred.b !== '';
+  }).length;
+
+  const predHTML = preds.length === 0
+    ? `<p style="font-size:13px;color:var(--fg-muted);font-style:italic">Nog geen voorspellingen ingevuld.</p>`
+    : preds.map((p, i) => {
+        const pct = total > 0 ? Math.round(p.count / total * 100) : 0;
+        const medals = ['🥇','🥈','🥉'];
+        return `<div class="next-match-pred-row">
+          <span class="next-match-medal">${medals[i]}</span>
+          <span class="next-match-score">${p.score}</span>
+          <div class="next-match-bar-wrap">
+            <div class="next-match-bar" style="width:${pct}%"></div>
+          </div>
+          <span class="next-match-pct">${p.count}× <span style="color:var(--fg-muted)">(${pct}%)</span></span>
+        </div>`;
+      }).join('');
+
+  el.innerHTML = `
+    <div class="card next-match-card">
+      <div class="card-title">Eerstvolgende groepswedstrijd</div>
+      <div class="next-match-fixture">
+        <div class="next-match-team">${match.a.replace('*','')}</div>
+        <div class="next-match-vs">
+          <div class="next-match-date">${match.date}</div>
+          <div style="font-family:'Bebas Neue';font-size:28px;color:var(--fg-muted);letter-spacing:3px">VS</div>
+          <div style="font-family:'Barlow Condensed';font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase">Groep ${match.group}</div>
+        </div>
+        <div class="next-match-team right">${match.b.replace('*','')}</div>
+      </div>
+      ${preds.length > 0 ? `
+      <div class="next-match-pred-title">
+        Meest voorspelde uitslag${preds.length > 1 ? 'en' : ''} <span style="color:var(--fg-muted);font-weight:400">(${filled}/${total} ingevuld)</span>
+      </div>` : ''}
+      ${predHTML}
+    </div>`;
+}
+
 function renderAnnouncements() {
   const el = document.getElementById('announcements-list');
   if (!el) return;
@@ -1947,6 +2116,7 @@ function showView(id) {
   document.getElementById(`view-${id}`).classList.add('active');
   if (viewMap[id] !== undefined) document.querySelectorAll('.nav-btn')[viewMap[id]].classList.add('active');
   if (id === 'ranglijst') renderLeaderboard();
+  if (id === 'aankondigingen') renderNextMatch();
 }
 
 function showToast(msg, isError = false) {
@@ -1967,6 +2137,7 @@ function showToast(msg, isError = false) {
   await loadAnnouncements();
   buildPredictForm();
   renderLeaderboard();
+  renderNextMatch();
 })();
 </script>
 </body>
