@@ -375,6 +375,41 @@
   .points-ref-item strong { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--gold); display: block; }
   .points-ref-item span { color: var(--fg-muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
 
+  /* ====== BRACKET ====== */
+  .bracket-round-title {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--gold);
+    border-bottom: 1px solid rgba(245,166,35,0.25);
+    padding-bottom: 8px; margin: 24px 0 14px;
+  }
+  .bracket-round-title:first-of-type { margin-top: 0; }
+  .bracket-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px; margin-bottom: 8px;
+  }
+  .bracket-match {
+    background: var(--match-card-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 10px 12px;
+  }
+  .bracket-match-label {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 8px; opacity: 0.8;
+  }
+  .bracket-match select {
+    width: 100%; margin-bottom: 4px;
+    border-bottom-width: 1px;
+  }
+  .bracket-match select:last-child { margin-bottom: 0; }
+  .bracket-vs {
+    font-family: 'Bebas Neue', cursive; font-size: 13px;
+    color: var(--fg-muted); text-align: center; letter-spacing: 2px;
+    margin: 2px 0; opacity: 0.6;
+  }
+
   /* ====== GROEPSSTAND ====== */
   .stand-table { width: 100%; border-collapse: collapse; }
   .stand-table th {
@@ -472,8 +507,8 @@
       <div class="points-ref">
         <div class="points-ref-item"><strong>3</strong><span>Juiste uitslag (W/G/V)</span></div>
         <div class="points-ref-item"><strong>6</strong><span>Exacte score</span></div>
-        <div class="points-ref-item"><strong>5</strong><span>Team naar R32</span></div>
-        <div class="points-ref-item"><strong>10</strong><span>Team naar R16</span></div>
+        <div class="points-ref-item"><strong>5</strong><span>Correct team R32</span></div>
+        <div class="points-ref-item"><strong>10</strong><span>Correct team R16</span></div>
         <div class="points-ref-item"><strong>15</strong><span>Team naar KW</span></div>
         <div class="points-ref-item"><strong>20</strong><span>Team naar HF</span></div>
         <div class="points-ref-item"><strong>25</strong><span>Finalist correct</span></div>
@@ -507,40 +542,27 @@
       <div id="stand-contents"></div>
     </div>
 
-    <!-- Knock-out -->
+    <!-- Knock-out bracket -->
     <div class="card">
-      <div class="card-title">Knock-outfase — Welke teams gaan door?</div>
+      <div class="card-title">Knock-outfase — Bracket</div>
+      <p style="font-size:12px;color:var(--fg-muted);margin-bottom:20px;letter-spacing:0.5px">
+        Kies per wedstrijd welke twee landen je verwacht. De volgorde van de wedstrijden volgt het officiële WK 2026 schema.
+      </p>
 
-      <div class="knockout-section">
-        <div class="knockout-round-title">Ronde van 32 — Kies 32 teams (5 ptn per team)</div>
-        <p style="font-size:12px;color:var(--fg-muted);margin-bottom:12px;letter-spacing:0.5px">De 24 groepswinnaar/runners-up gaan automatisch door, plus de 8 beste nummers drie. Kies welke 32 teams jij verwacht in de Ronde van 32.</p>
-        <div class="team-checkboxes" id="r32-picks"></div>
-        <p id="r32-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 32 geselecteerd</p>
-      </div>
+      <div class="bracket-round-title">Ronde van 32 &mdash; 5 punten per correct team</div>
+      <div class="bracket-grid" id="bracket-r32"></div>
 
-      <div class="knockout-section">
-        <div class="knockout-round-title">Ronde van 16 — Kies 16 teams (10 ptn per team)</div>
-        <div class="team-checkboxes" id="r16-picks"></div>
-        <p id="r16-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 16 geselecteerd</p>
-      </div>
+      <div class="bracket-round-title">Ronde van 16 &mdash; 10 punten per correct team</div>
+      <div class="bracket-grid" id="bracket-r16"></div>
 
-      <div class="knockout-section">
-        <div class="knockout-round-title">Kwartfinales — Kies 8 teams (15 ptn per team)</div>
-        <div class="team-checkboxes" id="qf-picks"></div>
-        <p id="qf-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 8 geselecteerd</p>
-      </div>
+      <div class="bracket-round-title">Kwartfinales &mdash; 15 punten per correct team</div>
+      <div class="bracket-grid" id="bracket-qf"></div>
 
-      <div class="knockout-section">
-        <div class="knockout-round-title">Halve Finales — Kies 4 teams (20 ptn per team)</div>
-        <div class="team-checkboxes" id="sf-picks"></div>
-        <p id="sf-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 4 geselecteerd</p>
-      </div>
+      <div class="bracket-round-title">Halve finales &mdash; 20 punten per correct team</div>
+      <div class="bracket-grid" id="bracket-sf"></div>
 
-      <div class="knockout-section">
-        <div class="knockout-round-title">Finale — Kies 2 teams (25 ptn per team)</div>
-        <div class="team-checkboxes" id="final-picks"></div>
-        <p id="final-count" style="font-size:11px;color:var(--fg-muted);margin-top:8px;letter-spacing:1px">0 / 2 geselecteerd</p>
-      </div>
+      <div class="bracket-round-title">Finale &mdash; 25 punten per correct team</div>
+      <div class="bracket-grid" id="bracket-final"></div>
     </div>
 
     <!-- Speciale picks -->
@@ -620,31 +642,22 @@
 
       <div class="card">
         <div class="card-title">Knock-out Uitslagen</div>
+        <p style="font-size:12px;color:var(--fg-muted);margin-bottom:16px">Voer per wedstrijd de werkelijke deelnemers in.</p>
 
-        <div style="margin-bottom:20px">
-          <p class="knockout-round-title">Werkelijke teams in R32</p>
-          <div class="team-checkboxes" id="admin-r32"></div>
-        </div>
+        <div class="bracket-round-title">Ronde van 32</div>
+        <div class="bracket-grid" id="admin-bracket-r32"></div>
 
-        <div style="margin-bottom:20px">
-          <p class="knockout-round-title">Werkelijke teams in R16</p>
-          <div class="team-checkboxes" id="admin-r16"></div>
-        </div>
+        <div class="bracket-round-title">Ronde van 16</div>
+        <div class="bracket-grid" id="admin-bracket-r16"></div>
 
-        <div style="margin-bottom:20px">
-          <p class="knockout-round-title">Werkelijke KW-teams</p>
-          <div class="team-checkboxes" id="admin-qf"></div>
-        </div>
+        <div class="bracket-round-title">Kwartfinales</div>
+        <div class="bracket-grid" id="admin-bracket-qf"></div>
 
-        <div style="margin-bottom:20px">
-          <p class="knockout-round-title">Werkelijke HF-teams</p>
-          <div class="team-checkboxes" id="admin-sf"></div>
-        </div>
+        <div class="bracket-round-title">Halve finales</div>
+        <div class="bracket-grid" id="admin-bracket-sf"></div>
 
-        <div style="margin-bottom:20px">
-          <p class="knockout-round-title">Werkelijke Finalisten</p>
-          <div class="team-checkboxes" id="admin-final"></div>
-        </div>
+        <div class="bracket-round-title">Finale</div>
+        <div class="bracket-grid" id="admin-bracket-final"></div>
 
         <div class="special-picks">
           <div class="form-group">
@@ -857,7 +870,7 @@ async function sb(path, options = {}) {
 // STATE
 // =============================================
 let participants = [];
-let results = { matches: {}, r16: [], qf: [], sf: [], final: [], champion: '', top_scorer: '', first_scorer: '', last_scorer: '' };
+let results = { matches: {}, bracket: {}, champion: '', top_scorer: '', first_scorer: '', last_scorer: '' };
 let adminUnlocked = false;
 
 function matchKey(g, a, b) { return `${g}_${a}_${b}`; }
@@ -872,7 +885,7 @@ async function loadState() {
       name: r.name,
       email: r.email || '',
       scores: r.scores || {},
-      knockout: r.knockout || { r32:[], r16:[], qf:[], sf:[], final:[] },
+      knockout: r.knockout || {},
       champion: r.champion || '',
       top_scorer: r.top_scorer || '',
       first_scorer: r.first_scorer || '',
@@ -885,10 +898,7 @@ async function loadState() {
       const r = rRows[0];
       results = {
         matches: r.matches || {},
-        r16: r.r16 || [],
-        qf: r.qf || [],
-        sf: r.sf || [],
-        final: r.final_teams || [],
+        bracket: r.bracket || {},
         champion: r.champion || '',
         top_scorer: r.top_scorer || '',
         first_scorer: r.first_scorer || '',
@@ -935,9 +945,9 @@ async function saveResults() {
       results.matches[key] = { a: va, b: vb, played };
     }
   }
-  const rounds = ['r32','r16','qf','sf','final'];
-  for (const round of rounds) {
-    results[round] = [...document.querySelectorAll(`#admin-${round} .team-check.selected`)].map(el => el.querySelector('input').value);
+  if (!results.bracket) results.bracket = {};
+  for (const round of ['r32','r16','qf','sf','final']) {
+    results.bracket[round] = readBracketRoundById(`admin-bracket-${round}`, round);
   }
   results.champion = document.getElementById('admin-champion').value;
   results.top_scorer = document.getElementById('admin-topscorer').value.trim();
@@ -949,10 +959,7 @@ async function saveResults() {
       method: 'PATCH',
       body: JSON.stringify({
         matches: results.matches,
-        r16: results.r16,
-        qf: results.qf,
-        sf: results.sf,
-        final_teams: results.final,
+        bracket: results.bracket,
         champion: results.champion,
         top_scorer: results.top_scorer,
         first_scorer: results.first_scorer,
@@ -1047,10 +1054,10 @@ function scoreParticipant(p) {
 
   const rounds = [['r32', POINTS.r32], ['r16', POINTS.r16], ['qf', POINTS.qf], ['sf', POINTS.sf], ['final', POINTS.final]];
   for (const [round, pts] of rounds) {
-    const actual = new Set(results[round] || []);
-    const picked = p.knockout?.[round] || [];
-    for (const team of picked) {
-      if (actual.has(team)) knockoutPts += pts;
+    const actualTeams = teamsInBracketRound(results.bracket?.[round]);
+    const pickedTeams = teamsInBracketRound(p.knockout?.[round]);
+    for (const team of pickedTeams) {
+      if (team && actualTeams.has(team)) knockoutPts += pts;
     }
   }
 
@@ -1123,16 +1130,17 @@ function toggleParticipantDetail(name) {
     </div>
   `).join('');
 
-  const roundLabels = { r32: 'R32', r16: 'R16', qf: 'KW', sf: 'HF', final: 'Finale' };
-  const knockRows = Object.entries(roundLabels).map(([k, label]) => {
-    const picked = p.knockout?.[k] || [];
-    const actual = new Set(results[k] || []);
-    return picked.map(team => `
+  const ROUND_LABELS_DETAIL = { r32: 'R32', r16: 'R16', qf: 'KW', sf: 'HF', final: 'Finale' };
+  const knockRows = Object.entries(ROUND_LABELS_DETAIL).map(([k, label]) => {
+    const pickedTeams = teamsInBracketRound(p.knockout?.[k]);
+    const actualTeams = teamsInBracketRound(results.bracket?.[k]);
+    const hasActual = actualTeams.size > 0;
+    return [...pickedTeams].filter(t => t).map(team => `
       <div class="match-result-row">
         <span style="color:var(--fg-muted);font-size:12px">${label}: ${team}</span>
         <span></span><span></span>
-        <span style="font-size:11px;color:${actual.has(team) ? 'var(--neon)' : 'var(--fg-muted)'}">${actual.has(team) ? '✓ Correct' : actual.size > 0 ? '✗ Fout' : 'Afwachten'}</span>
-        <span class="pts-badge ${actual.has(team) ? '' : 'zero'}">${actual.has(team) ? POINTS[k] : 0}</span>
+        <span style="font-size:11px;color:${actualTeams.has(team) ? 'var(--neon)' : 'var(--fg-muted)'}">${actualTeams.has(team) ? '✓ Correct' : hasActual ? '✗ Fout' : 'Afwachten'}</span>
+        <span class="pts-badge ${actualTeams.has(team) ? '' : 'zero'}">${actualTeams.has(team) ? POINTS[k] : 0}</span>
       </div>
     `).join('');
   }).join('');
@@ -1354,48 +1362,131 @@ function buildPredictForm() {
     contentsEl.appendChild(div);
   });
 
-  buildKnockoutCheckboxes('r32-picks', 'r32', LIMITS.r32);
-  buildKnockoutCheckboxes('r16-picks', 'r16', LIMITS.r16);
-  buildKnockoutCheckboxes('qf-picks', 'qf', LIMITS.qf);
-  buildKnockoutCheckboxes('sf-picks', 'sf', LIMITS.sf);
-  buildKnockoutCheckboxes('final-picks', 'final', LIMITS.final);
+  buildBracketRound('bracket-r32', 'r32', null);
+  buildBracketRound('bracket-r16', 'r16', null);
+  buildBracketRound('bracket-qf', 'qf', null);
+  buildBracketRound('bracket-sf', 'sf', null);
+  buildBracketRound('bracket-final', 'final', null);
   buildStandingTabs();
 
   const sel = document.getElementById('pick-champion');
   sel.innerHTML = '<option value="">— Selecteer land —</option>' + ALL_TEAMS.map(t => `<option value="${t}">${t}</option>`).join('');
 }
 
-function buildKnockoutCheckboxes(containerId, round, limit) {
+// =============================================
+// BRACKET DROPDOWNS
+// =============================================
+const BRACKET_MATCH_COUNTS = { r32: 16, r16: 8, qf: 4, sf: 2, final: 1 }; // ook: BRACKET_SLOTS[round].length
+
+// Per wedstrijd: [label, placeholder_a, placeholder_b]
+const BRACKET_SLOTS = {
+  r32: [
+    ['W73', '2e plaats Groep A',    '2e plaats Groep B'],
+    ['W74', 'Winnaar Groep E',      'Beste nr. 3 (A/B/C/D/F)'],
+    ['W75', 'Winnaar Groep F',      '2e plaats Groep C'],
+    ['W76', 'Winnaar Groep C',      '2e plaats Groep F'],
+    ['W77', 'Winnaar Groep I',      'Beste nr. 3 (C/D/F/G/H)'],
+    ['W78', '2e plaats Groep E',    '2e plaats Groep I'],
+    ['W79', 'Winnaar Groep A',      'Beste nr. 3 (C/E/F/H/I)'],
+    ['W80', 'Winnaar Groep L',      'Beste nr. 3 (E/H/I/J/K)'],
+    ['W81', 'Winnaar Groep D',      'Beste nr. 3 (B/E/F/I/J)'],
+    ['W82', 'Winnaar Groep G',      'Beste nr. 3 (A/E/H/I/J)'],
+    ['W83', '2e plaats Groep K',    '2e plaats Groep L'],
+    ['W84', 'Winnaar Groep H',      '2e plaats Groep J'],
+    ['W85', 'Winnaar Groep B',      'Beste nr. 3 (E/F/G/I/J)'],
+    ['W86', 'Winnaar Groep J',      '2e plaats Groep H'],
+    ['W87', 'Winnaar Groep K',      'Beste nr. 3 (D/E/I/J/L)'],
+    ['W88', '2e plaats Groep D',    '2e plaats Groep G'],
+  ],
+  r16: [
+    ['R16-1 (W73 vs W74)', 'Winnaar W73', 'Winnaar W74'],
+    ['R16-2 (W75 vs W76)', 'Winnaar W75', 'Winnaar W76'],
+    ['R16-3 (W77 vs W78)', 'Winnaar W77', 'Winnaar W78'],
+    ['R16-4 (W79 vs W80)', 'Winnaar W79', 'Winnaar W80'],
+    ['R16-5 (W81 vs W82)', 'Winnaar W81', 'Winnaar W82'],
+    ['R16-6 (W83 vs W84)', 'Winnaar W83', 'Winnaar W84'],
+    ['R16-7 (W85 vs W86)', 'Winnaar W85', 'Winnaar W86'],
+    ['R16-8 (W87 vs W88)', 'Winnaar W87', 'Winnaar W88'],
+  ],
+  qf: [
+    ['KW-1 (Win. R16-1 vs Win. R16-2)', 'Winnaar R16-1', 'Winnaar R16-2'],
+    ['KW-2 (Win. R16-3 vs Win. R16-4)', 'Winnaar R16-3', 'Winnaar R16-4'],
+    ['KW-3 (Win. R16-5 vs Win. R16-6)', 'Winnaar R16-5', 'Winnaar R16-6'],
+    ['KW-4 (Win. R16-7 vs Win. R16-8)', 'Winnaar R16-7', 'Winnaar R16-8'],
+  ],
+  sf: [
+    ['HF-1 (Win. KW-1 vs Win. KW-2)', 'Winnaar KW-1', 'Winnaar KW-2'],
+    ['HF-2 (Win. KW-3 vs Win. KW-4)', 'Winnaar KW-3', 'Winnaar KW-4'],
+  ],
+  final: [
+    ['Finale (Win. HF-1 vs Win. HF-2)', 'Winnaar HF-1', 'Winnaar HF-2'],
+  ],
+};
+
+function teamOptions(placeholderA, placeholderB, role) {
+  const ph = role === 'a' ? placeholderA : placeholderB;
+  return `<option value="">— ${ph} —</option>` +
+    ALL_TEAMS.map(t => `<option value="${t}">${t.replace('*','')}</option>`).join('');
+}
+
+function buildBracketRound(containerId, round, savedKnockout) {
   const el = document.getElementById(containerId);
-  el.innerHTML = ALL_TEAMS.map(team => {
-    const isPlaceholder = team.endsWith('*');
-    const safeId = `kc-${round}-${team.replace(/[\s\-\'\*\.\/]/g,'_')}`;
-    const safeTeam = team.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return `<div class="team-check" id="${safeId}" onclick="toggleKnockoutPick('${round}', '${safeTeam}', ${limit})">
-      <input type="checkbox" value="${team}" onclick="event.stopPropagation()">
-      <div class="check-indicator">✓</div>
-      <span class="check-team-name${isPlaceholder ? ' placeholder' : ''}">${team.replace('*','')}</span>
+  if (!el) return;
+  const slots = BRACKET_SLOTS[round] || [];
+  const saved = savedKnockout || {};
+
+  let html = '';
+  slots.forEach(([label, phA, phB], i) => {
+    const valA = saved[`${i}_a`] || '';
+    const valB = saved[`${i}_b`] || '';
+    const optsA = teamOptions(phA, phB, 'a').replace(`value="${valA}"`, `value="${valA}" selected`);
+    const optsB = teamOptions(phA, phB, 'b').replace(`value="${valB}"`, `value="${valB}" selected`);
+    html += `<div class="bracket-match">
+      <div class="bracket-match-label">${label}</div>
+      <select id="bk_${round}_${i}_a" onchange="saveBracketPick()">${optsA}</select>
+      <div class="bracket-vs">vs</div>
+      <select id="bk_${round}_${i}_b" onchange="saveBracketPick()">${optsB}</select>
     </div>`;
-  }).join('');
+  });
+  el.innerHTML = html;
 }
 
-function toggleKnockoutPick(round, team, limit) {
-  const id = `kc-${round}-${team.replace(/[\s\-\'\*\.\/]/g,'_')}`;
-  const el = document.getElementById(id);
-  const selected = el.classList.contains('selected');
-  if (!selected) {
-    const currentCount = document.querySelectorAll(`#${round}-picks .team-check.selected`).length;
-    if (currentCount >= limit) { showToast(`Maximaal ${limit} teams voor deze ronde`, true); return; }
+function saveBracketPick() { /* state collected on submit */ }
+
+function readBracketRoundById(containerId, round) {
+  const count = BRACKET_MATCH_COUNTS[round];
+  const result = {};
+  for (let i = 0; i < count; i++) {
+    const a = document.getElementById(`bk_${round}_${i}_a`)?.value || '';
+    const b = document.getElementById(`bk_${round}_${i}_b`)?.value || '';
+    if (a) result[`${i}_a`] = a;
+    if (b) result[`${i}_b`] = b;
   }
-  el.classList.toggle('selected');
-  el.querySelector('input').checked = !selected;
-  updateKnockoutCount(round, limit);
+  return result;
 }
 
-function updateKnockoutCount(round, limit) {
-  const count = document.querySelectorAll(`#${round}-picks .team-check.selected`).length;
-  const el = document.getElementById(`${round}-count`);
-  if (el) el.textContent = `${count} / ${limit} geselecteerd`;
+function readBracketRound(round) {
+  const count = BRACKET_MATCH_COUNTS[round];
+  const result = {};
+  for (let i = 0; i < count; i++) {
+    const a = document.getElementById(`bk_${round}_${i}_a`)?.value || '';
+    const b = document.getElementById(`bk_${round}_${i}_b`)?.value || '';
+    if (a) result[`${i}_a`] = a;
+    if (b) result[`${i}_b`] = b;
+  }
+  return result;
+}
+
+function collectKnockout() {
+  const rounds = ['r32','r16','qf','sf','final'];
+  const ko = {};
+  for (const r of rounds) ko[r] = readBracketRound(r);
+  return ko;
+}
+
+// Scoring: collect all teams mentioned in a round
+function teamsInBracketRound(koRound) {
+  return new Set(Object.values(koRound || {}));
 }
 
 function switchGroupTab(group, prefix) {
@@ -1441,13 +1532,7 @@ async function submitPredictions() {
     return;
   }
 
-  const knockout = {
-    r32: [...document.querySelectorAll('#r32-picks .team-check.selected')].map(el => el.querySelector('input').value),
-    r16: [...document.querySelectorAll('#r16-picks .team-check.selected')].map(el => el.querySelector('input').value),
-    qf: [...document.querySelectorAll('#qf-picks .team-check.selected')].map(el => el.querySelector('input').value),
-    sf: [...document.querySelectorAll('#sf-picks .team-check.selected')].map(el => el.querySelector('input').value),
-    final: [...document.querySelectorAll('#final-picks .team-check.selected')].map(el => el.querySelector('input').value),
-  };
+  const knockout = collectKnockout();
 
   const champion = document.getElementById('pick-champion').value;
   const top_scorer = document.getElementById('pick-topscorer').value.trim();
@@ -1530,11 +1615,11 @@ function buildAdminPanel() {
     contentsEl.appendChild(div);
   });
 
-  buildAdminKnockoutCheckboxes('admin-r32', 'r32', LIMITS.r32);
-  buildAdminKnockoutCheckboxes('admin-r16', 'r16', LIMITS.r16);
-  buildAdminKnockoutCheckboxes('admin-qf', 'qf', LIMITS.qf);
-  buildAdminKnockoutCheckboxes('admin-sf', 'sf', LIMITS.sf);
-  buildAdminKnockoutCheckboxes('admin-final', 'final', LIMITS.final);
+  buildBracketRound('admin-bracket-r32', 'r32', results.bracket?.r32);
+  buildBracketRound('admin-bracket-r16', 'r16', results.bracket?.r16);
+  buildBracketRound('admin-bracket-qf', 'qf', results.bracket?.qf);
+  buildBracketRound('admin-bracket-sf', 'sf', results.bracket?.sf);
+  buildBracketRound('admin-bracket-final', 'final', results.bracket?.final);
 
   const sel = document.getElementById('admin-champion');
   sel.innerHTML = '<option value="">— Nog niet beslist —</option>' + ALL_TEAMS.map(t => `<option value="${t}" ${results.champion === t ? 'selected' : ''}>${t}</option>`).join('');
@@ -1543,32 +1628,7 @@ function buildAdminPanel() {
   document.getElementById('admin-last-scorer').value = results.last_scorer || '';
 }
 
-function buildAdminKnockoutCheckboxes(containerId, round, limit) {
-  const el = document.getElementById(containerId);
-  const saved = new Set(results[round] || []);
-  el.innerHTML = ALL_TEAMS.map(team => {
-    const isPlaceholder = team.endsWith('*');
-    const safeId = `adk-${round}-${team.replace(/[\s\-\'\*\.\/]/g,'_')}`;
-    const safeTeam = team.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return `<div class="team-check ${saved.has(team) ? 'selected' : ''}" id="${safeId}" onclick="toggleAdminKnock('${round}', '${safeTeam}', ${limit})">
-      <input type="checkbox" value="${team}" ${saved.has(team) ? 'checked' : ''} onclick="event.stopPropagation()">
-      <div class="check-indicator">✓</div>
-      <span class="check-team-name${isPlaceholder ? ' placeholder' : ''}">${team.replace('*','')}</span>
-    </div>`;
-  }).join('');
-}
-
-function toggleAdminKnock(round, team, limit) {
-  const id = `adk-${round}-${team.replace(/[\s\-\'\*\.\/]/g,'_')}`;
-  const el = document.getElementById(id);
-  const selected = el.classList.contains('selected');
-  if (!selected) {
-    const currentCount = document.querySelectorAll(`#admin-${round} .team-check.selected`).length;
-    if (currentCount >= limit) { showToast(`Maximaal ${limit} voor deze ronde`, true); return; }
-  }
-  el.classList.toggle('selected');
-  el.querySelector('input').checked = !selected;
-}
+// buildAdminKnockoutCheckboxes en toggleAdminKnock vervangen door bracket dropdowns
 
 function exportData() {
   const data = { participants, results, exported: new Date().toISOString() };
