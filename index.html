@@ -376,6 +376,55 @@
   .points-ref-item strong { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--gold); display: block; }
   .points-ref-item span { color: var(--fg-muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
 
+  /* ====== PRIJZENGELD ====== */
+  .prize-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .prize-item {
+    background: var(--match-card-bg);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--border);
+    padding: 14px;
+    text-align: center;
+  }
+  .prize-item.rank-1 { border-top-color: var(--gold); }
+  .prize-item.rank-2 { border-top-color: #b0b8c8; }
+  .prize-item.rank-3 { border-top-color: #b87333; }
+  .prize-item.special { border-top-color: var(--accent); grid-column: 1 / -1; }
+  .prize-rank {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--fg-muted);
+    margin-bottom: 6px;
+  }
+  .prize-pct {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 32px; color: var(--gold); letter-spacing: 2px;
+    line-height: 1;
+  }
+  .prize-desc { font-size: 11px; color: var(--fg-muted); margin-top: 4px; letter-spacing: 1px; }
+
+  /* ====== SPELREGELS ====== */
+  .rules-list {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .rules-list li {
+    padding: 11px 0 11px 22px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px; line-height: 1.6;
+    color: var(--fg-muted);
+    position: relative;
+  }
+  .rules-list li:last-child { border-bottom: none; }
+  .rules-list li::before {
+    content: '—';
+    position: absolute; left: 0;
+    color: var(--accent); font-weight: 700;
+  }
+  .rules-list li strong { color: var(--fg); }
+
   /* ====== VOLGENDE WEDSTRIJD ====== */
   .next-match-card { margin-bottom: 20px; }
 
@@ -570,10 +619,13 @@
 
 <div id="toast"></div>
 
-<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
-  <span id="theme-icon">☀️</span>
-  <span id="theme-label">Licht</span>
-</button>
+<div style="position:fixed;top:16px;right:20px;z-index:1000;display:flex;gap:8px">
+  <button class="theme-toggle" style="position:static" onclick="showView('admin')">⚙️ Admin</button>
+  <button class="theme-toggle" style="position:static" onclick="toggleTheme()" id="theme-btn">
+    <span id="theme-icon">☀️</span>
+    <span id="theme-label">Licht</span>
+  </button>
+</div>
 
 <header>
   <div class="logo-mark">⚽</div>
@@ -584,8 +636,9 @@
 <nav>
   <button class="nav-btn active" onclick="showView('aankondigingen')">Nieuws</button>
   <button class="nav-btn" onclick="showView('ranglijst')">Ranglijst</button>
-  <button class="nav-btn" onclick="showView('voorspel')">Voorspellingen</button>
-  <button class="nav-btn" onclick="showView('admin')">Admin</button>
+  <button class="nav-btn" onclick="showView('spelregels')">Spelregels</button>
+  <button class="nav-btn" onclick="showView('voorspel')">Invulformulier</button>
+
 </nav>
 
 <main>
@@ -635,15 +688,103 @@
   </div>
 
   <!-- ======= VOORSPELLINGEN ======= -->
-  <div id="view-voorspel" class="view">
-    <div class="section-title">Jouw Voorspellingen</div>
+  <!-- ======= SPELREGELS ======= -->
+  <div id="view-spelregels" class="view">
+    <div class="section-title">Spelregels</div>
+    <p class="section-desc">Lees de spelregels goed door voordat je je formulier instuurt</p>
+
+    <div class="card">
+      <div class="card-title">Deelname &amp; inschrijving</div>
+      <ul class="rules-list">
+        <li>Je voorspelling moet ingevuld zijn vóór <strong>11 juni 2026 om 20:00 uur</strong> (Nederlandse tijd). Na dit tijdstip is het formulier gesloten.</li>
+        <li>Inleg per deelnemer: <strong>€ 10,00</strong>. Betaling via de QR-code op het invulformulier.</li>
+        <li>De WK-pool gaat door bij minimaal <strong>12 deelnemers</strong>. Indien dit minimum niet wordt gehaald, wordt het reeds betaalde inlegbedrag zo snel mogelijk gerestitueerd.</li>
+        <li>Meedoen onder de naam van huisdieren, partners of niet-meespelende kinderen wordt gedoogd tot een maximum van <strong>twee extra formulieren</strong>.</li>
+        <li>Het inleveren van het ingevulde formulier betekent dat je <strong>akkoord gaat</strong> met deze spelregels en voorwaarden.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Puntentelling</div>
+      <div class="points-ref" style="margin-bottom:20px">
+        <div class="points-ref-item"><strong>3</strong><span>Juiste uitslag (W/G/V)</span></div>
+        <div class="points-ref-item"><strong>6</strong><span>Exacte score</span></div>
+        <div class="points-ref-item"><strong>5</strong><span>Correct team R32</span></div>
+        <div class="points-ref-item"><strong>10</strong><span>Correct team R16</span></div>
+        <div class="points-ref-item"><strong>15</strong><span>Correct team KW</span></div>
+        <div class="points-ref-item"><strong>20</strong><span>Correct team HF</span></div>
+        <div class="points-ref-item"><strong>25</strong><span>Correct team Finale</span></div>
+        <div class="points-ref-item"><strong>30</strong><span>Kampioen correct</span></div>
+        <div class="points-ref-item"><strong>25</strong><span>Topscorer correct</span></div>
+        <div class="points-ref-item"><strong>15</strong><span>Eerste doelpuntenmaker</span></div>
+        <div class="points-ref-item"><strong>20</strong><span>Laatste doelpuntenmaker</span></div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:var(--pts-ref-bg);border:1px solid var(--border)">
+        <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">🎯 Groepsfase Bonuspunten</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="font-size:12px;color:var(--fg-muted)"><strong style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);display:block">+10</strong>8–15 goede uitslagen</div>
+          <div style="font-size:12px;color:var(--fg-muted)"><strong style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);display:block">+25</strong>16–23 goede uitslagen</div>
+          <div style="font-size:12px;color:var(--fg-muted)"><strong style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);display:block">+50</strong>24+ goede uitslagen</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Prijzengeld</div>
+      <p style="font-size:13px;color:var(--fg-muted);margin-bottom:16px">De totale inleg wordt als volgt verdeeld. Bij 12 deelnemers is de pot <strong style="color:var(--fg)">€ 120</strong>.</p>
+      <div class="prize-grid">
+        <div class="prize-item rank-1">
+          <div class="prize-rank">🥇 1e plaats</div>
+          <div class="prize-pct">40%</div>
+          <div class="prize-desc">van de totale inleg</div>
+        </div>
+        <div class="prize-item rank-2">
+          <div class="prize-rank">🥈 2e plaats</div>
+          <div class="prize-pct">25%</div>
+          <div class="prize-desc">van de totale inleg</div>
+        </div>
+        <div class="prize-item rank-3">
+          <div class="prize-rank">🥉 3e plaats</div>
+          <div class="prize-pct">20%</div>
+          <div class="prize-desc">van de totale inleg</div>
+        </div>
+        <div class="prize-item">
+          <div class="prize-rank">4e plaats</div>
+          <div class="prize-pct">10%</div>
+          <div class="prize-desc">van de totale inleg</div>
+        </div>
+        <div class="prize-item">
+          <div class="prize-rank">5e plaats</div>
+          <div class="prize-pct">5%</div>
+          <div class="prize-desc">van de totale inleg</div>
+        </div>
+        <div class="prize-item special">
+          <div class="prize-rank">⚽ Meeste goede uitslagen groepsfase</div>
+          <div class="prize-pct" style="font-size:20px">Inschrijfgeld terug</div>
+          <div class="prize-desc">ongeacht eindstand</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Overige regels</div>
+      <ul class="rules-list">
+        <li>Per knock-out ronde mag een land maar <strong>één keer</strong> ingevuld worden — dus niet hetzelfde land in twee wedstrijden van dezelfde ronde.</li>
+        <li>De opgegeven wereldkampioen hoeft <strong>niet per se</strong> een van de twee finalisten te zijn.</li>
+        <li>Bij gelijke eindstand geeft het <strong>aantal goed voorspelde uitslagen in de groepsfase</strong> de doorslag.</li>
+      </ul>
+    </div>
+  </div>
+
+    <div id="view-voorspel" class="view">
+    <div class="section-title">Invulformulier</div>
     <p class="section-desc">Vul al je picks in voor het hele toernooi</p>
 
     <div class="card">
       <div class="card-title">Jouw gegevens</div>
       <div class="form-group">
-        <label>Naam</label>
-        <input type="text" id="predict-name" placeholder="Vul je naam in...">
+        <label>Voor- en achternaam</label>
+        <input type="text" id="predict-name" placeholder="bijv. Jan de Vries">
       </div>
       <div class="form-group">
         <label>E-mailadres</label>
@@ -883,136 +1024,136 @@ const GROUPS = {
   A: {
     teams: ['Mexico','Zuid-Afrika','Zuid-Korea','Tsjechië'],
     matches: [
-      ['Mexico','Zuid-Afrika','11 jun'],
-      ['Zuid-Korea','Tsjechië','11 jun'],
-      ['Mexico','Zuid-Korea','18 jun'],
-      ['Tsjechië','Zuid-Afrika','18 jun'],
-      ['Tsjechië','Mexico','24 jun'],
-      ['Zuid-Afrika','Zuid-Korea','24 jun'],
+      ['Mexico','Zuid-Afrika','11 jun','21:00','2026-06-11T21:00:00+02:00'],
+      ['Zuid-Korea','Tsjechië','12 jun','04:00','2026-06-12T04:00:00+02:00'],
+      ['Mexico','Zuid-Korea','18 jun','22:00','2026-06-18T22:00:00+02:00'],
+      ['Tsjechië','Zuid-Afrika','19 jun','04:00','2026-06-19T04:00:00+02:00'],
+      ['Tsjechië','Mexico','24 jun','22:00','2026-06-24T22:00:00+02:00'],
+      ['Zuid-Afrika','Zuid-Korea','24 jun','22:00','2026-06-24T22:00:00+02:00'],
     ]
   },
   B: {
     teams: ['Canada','Bosnië-Herzegovina','Qatar','Zwitserland'],
     matches: [
-      ['Canada','Bosnië-Herzegovina','12 jun'],
-      ['Qatar','Zwitserland','13 jun'],
-      ['Zwitserland','Bosnië-Herzegovina','18 jun'],
-      ['Canada','Qatar','18 jun'],
-      ['Zwitserland','Canada','24 jun'],
-      ['Bosnië-Herzegovina','Qatar','24 jun'],
+      ['Canada','Bosnië-Herzegovina','12 jun','21:00','2026-06-12T21:00:00+02:00'],
+      ['Qatar','Zwitserland','13 jun','21:00','2026-06-13T21:00:00+02:00'],
+      ['Zwitserland','Bosnië-Herzegovina','18 jun','21:00','2026-06-18T21:00:00+02:00'],
+      ['Canada','Qatar','18 jun','21:00','2026-06-18T21:00:00+02:00'],
+      ['Zwitserland','Canada','24 jun','02:00','2026-06-25T02:00:00+02:00'],
+      ['Bosnië-Herzegovina','Qatar','24 jun','02:00','2026-06-25T02:00:00+02:00'],
     ]
   },
   C: {
     teams: ['Brazilië','Marokko','Haïti','Schotland'],
     matches: [
-      ['Brazilië','Marokko','13 jun'],
-      ['Haïti','Schotland','13 jun'],
-      ['Schotland','Marokko','19 jun'],
-      ['Brazilië','Haïti','19 jun'],
-      ['Schotland','Brazilië','24 jun'],
-      ['Marokko','Haïti','24 jun'],
+      ['Brazilië','Marokko','14 jun','00:00','2026-06-14T00:00:00+02:00'],
+      ['Haïti','Schotland','14 jun','03:00','2026-06-14T03:00:00+02:00'],
+      ['Schotland','Marokko','19 jun','21:00','2026-06-19T21:00:00+02:00'],
+      ['Brazilië','Haïti','19 jun','21:00','2026-06-19T21:00:00+02:00'],
+      ['Schotland','Brazilië','25 jun','02:00','2026-06-25T02:00:00+02:00'],
+      ['Marokko','Haïti','25 jun','02:00','2026-06-25T02:00:00+02:00'],
     ]
   },
   D: {
     teams: ['VS','Paraguay','Australië','Turkije'],
     matches: [
-      ['VS','Paraguay','12 jun'],
-      ['Australië','Turkije','13 jun'],
-      ['VS','Australië','19 jun'],
-      ['Turkije','Paraguay','19 jun'],
-      ['Turkije','VS','25 jun'],
-      ['Paraguay','Australië','25 jun'],
+      ['VS','Paraguay','13 jun','03:00','2026-06-13T03:00:00+02:00'],
+      ['Australië','Turkije','14 jun','06:00','2026-06-14T06:00:00+02:00'],
+      ['VS','Australië','19 jun','03:00','2026-06-19T03:00:00+02:00'],
+      ['Turkije','Paraguay','19 jun','03:00','2026-06-19T03:00:00+02:00'],
+      ['Turkije','VS','25 jun','22:00','2026-06-25T22:00:00+02:00'],
+      ['Paraguay','Australië','25 jun','22:00','2026-06-25T22:00:00+02:00'],
     ]
   },
   E: {
     teams: ['Duitsland','Curaçao','Ivoorkust','Ecuador'],
     matches: [
-      ['Duitsland','Curaçao','14 jun'],
-      ['Ivoorkust','Ecuador','15 jun'],
-      ['Duitsland','Ivoorkust','20 jun'],
-      ['Ecuador','Curaçao','20 jun'],
-      ['Ecuador','Duitsland','25 jun'],
-      ['Curaçao','Ivoorkust','25 jun'],
+      ['Duitsland','Curaçao','14 jun','19:00','2026-06-14T19:00:00+02:00'],
+      ['Ivoorkust','Ecuador','15 jun','01:00','2026-06-15T01:00:00+02:00'],
+      ['Duitsland','Ivoorkust','20 jun','21:00','2026-06-20T21:00:00+02:00'],
+      ['Ecuador','Curaçao','20 jun','21:00','2026-06-20T21:00:00+02:00'],
+      ['Ecuador','Duitsland','25 jun','22:00','2026-06-25T22:00:00+02:00'],
+      ['Curaçao','Ivoorkust','25 jun','22:00','2026-06-25T22:00:00+02:00'],
     ]
   },
   F: {
     teams: ['Nederland','Japan','Zweden','Tunesië'],
     matches: [
-      ['Nederland','Japan','14 jun'],
-      ['Zweden','Tunesië','14 jun'],
-      ['Nederland','Zweden','20 jun'],
-      ['Tunesië','Japan','20 jun'],
-      ['Tunesië','Nederland','25 jun'],
-      ['Japan','Zweden','25 jun'],
+      ['Nederland','Japan','14 jun','22:00','2026-06-14T22:00:00+02:00'],
+      ['Zweden','Tunesië','15 jun','04:00','2026-06-15T04:00:00+02:00'],
+      ['Nederland','Zweden','20 jun','03:00','2026-06-20T03:00:00+02:00'],
+      ['Tunesië','Japan','20 jun','06:00','2026-06-20T06:00:00+02:00'],
+      ['Tunesië','Nederland','26 jun','02:00','2026-06-26T02:00:00+02:00'],
+      ['Japan','Zweden','26 jun','02:00','2026-06-26T02:00:00+02:00'],
     ]
   },
   G: {
     teams: ['België','Egypte','Iran','Nieuw-Zeeland'],
     matches: [
-      ['Iran','Nieuw-Zeeland','15 jun'],
-      ['België','Egypte','16 jun'],
-      ['België','Iran','21 jun'],
-      ['Egypte','Nieuw-Zeeland','21 jun'],
-      ['Egypte','Iran','26 jun'],
-      ['Nieuw-Zeeland','België','26 jun'],
+      ['Iran','Nieuw-Zeeland','15 jun','21:00','2026-06-15T21:00:00+02:00'],
+      ['België','Egypte','16 jun','00:00','2026-06-16T00:00:00+02:00'],
+      ['België','Iran','21 jun','21:00','2026-06-21T21:00:00+02:00'],
+      ['Egypte','Nieuw-Zeeland','21 jun','21:00','2026-06-21T21:00:00+02:00'],
+      ['Egypte','Iran','26 jun','22:00','2026-06-26T22:00:00+02:00'],
+      ['Nieuw-Zeeland','België','26 jun','22:00','2026-06-26T22:00:00+02:00'],
     ]
   },
   H: {
     teams: ['Spanje','Saudi-Arabië','Kaapverdië','Uruguay'],
     matches: [
-      ['Spanje','Kaapverdië','15 jun'],
-      ['Saudi-Arabië','Uruguay','15 jun'],
-      ['Spanje','Saudi-Arabië','21 jun'],
-      ['Uruguay','Kaapverdië','21 jun'],
-      ['Uruguay','Spanje','26 jun'],
-      ['Kaapverdië','Saudi-Arabië','26 jun'],
+      ['Spanje','Kaapverdië','15 jun','18:00','2026-06-15T18:00:00+02:00'],
+      ['Saudi-Arabië','Uruguay','15 jun','21:00','2026-06-15T21:00:00+02:00'],
+      ['Spanje','Saudi-Arabië','21 jun','00:00','2026-06-21T00:00:00+02:00'],
+      ['Uruguay','Kaapverdië','21 jun','03:00','2026-06-21T03:00:00+02:00'],
+      ['Uruguay','Spanje','26 jun','02:00','2026-06-26T02:00:00+02:00'],
+      ['Kaapverdië','Saudi-Arabië','26 jun','02:00','2026-06-26T02:00:00+02:00'],
     ]
   },
   I: {
     teams: ['Frankrijk','Senegal','Irak','Noorwegen'],
     matches: [
-      ['Irak','Noorwegen','16 jun'],
-      ['Frankrijk','Senegal','17 jun'],
-      ['Frankrijk','Noorwegen','22 jun'],
-      ['Senegal','Irak','22 jun'],
-      ['Noorwegen','Senegal','27 jun'],
-      ['Irak','Frankrijk','27 jun'],
+      ['Irak','Noorwegen','16 jun','21:00','2026-06-16T21:00:00+02:00'],
+      ['Frankrijk','Senegal','17 jun','21:00','2026-06-17T21:00:00+02:00'],
+      ['Frankrijk','Noorwegen','22 jun','21:00','2026-06-22T21:00:00+02:00'],
+      ['Senegal','Irak','22 jun','21:00','2026-06-22T21:00:00+02:00'],
+      ['Noorwegen','Senegal','27 jun','02:00','2026-06-27T02:00:00+02:00'],
+      ['Irak','Frankrijk','27 jun','02:00','2026-06-27T02:00:00+02:00'],
     ]
   },
   J: {
     teams: ['Argentinië','Algerije','Oostenrijk','Jordanië'],
     matches: [
-      ['Argentinië','Algerije','16 jun'],
-      ['Oostenrijk','Jordanië','17 jun'],
-      ['Argentinië','Oostenrijk','22 jun'],
-      ['Jordanië','Algerije','22 jun'],
-      ['Jordanië','Argentinië','27 jun'],
-      ['Algerije','Oostenrijk','27 jun'],
+      ['Argentinië','Algerije','17 jun','03:00','2026-06-17T03:00:00+02:00'],
+      ['Oostenrijk','Jordanië','17 jun','19:00','2026-06-17T19:00:00+02:00'],
+      ['Argentinië','Oostenrijk','22 jun','19:00','2026-06-22T19:00:00+02:00'],
+      ['Jordanië','Algerije','22 jun','22:00','2026-06-22T22:00:00+02:00'],
+      ['Jordanië','Argentinië','27 jun','04:00','2026-06-27T04:00:00+02:00'],
+      ['Algerije','Oostenrijk','27 jun','22:00','2026-06-27T22:00:00+02:00'],
     ]
   },
   K: {
     teams: ['Portugal','DR Congo','Oezbekistan','Colombia'],
     matches: [
-      ['Oezbekistan','Colombia','17 jun'],
-      ['Portugal','DR Congo','18 jun'],
-      ['Portugal','Oezbekistan','23 jun'],
-      ['Colombia','DR Congo','23 jun'],
-      ['Colombia','Portugal','27 jun'],
-      ['DR Congo','Oezbekistan','27 jun'],
+      ['Oezbekistan','Colombia','17 jun','22:00','2026-06-17T22:00:00+02:00'],
+      ['Portugal','DR Congo','18 jun','21:00','2026-06-18T21:00:00+02:00'],
+      ['Portugal','Oezbekistan','23 jun','21:00','2026-06-23T21:00:00+02:00'],
+      ['Colombia','DR Congo','23 jun','21:00','2026-06-23T21:00:00+02:00'],
+      ['Colombia','Portugal','27 jun','22:00','2026-06-27T22:00:00+02:00'],
+      ['DR Congo','Oezbekistan','27 jun','22:00','2026-06-27T22:00:00+02:00'],
     ]
   },
   L: {
     teams: ['Engeland','Kroatië','Ghana','Panama'],
     matches: [
-      ['Engeland','Kroatië','17 jun'],
-      ['Ghana','Panama','18 jun'],
-      ['Engeland','Ghana','23 jun'],
-      ['Panama','Kroatië','23 jun'],
-      ['Panama','Engeland','27 jun'],
-      ['Kroatië','Ghana','27 jun'],
+      ['Engeland','Kroatië','17 jun','22:00','2026-06-17T22:00:00+02:00'],
+      ['Ghana','Panama','18 jun','03:00','2026-06-18T03:00:00+02:00'],
+      ['Engeland','Ghana','23 jun','22:00','2026-06-23T22:00:00+02:00'],
+      ['Panama','Kroatië','23 jun','22:00','2026-06-23T22:00:00+02:00'],
+      ['Panama','Engeland','27 jun','23:00','2026-06-27T23:00:00+02:00'],
+      ['Kroatië','Ghana','27 jun','23:00','2026-06-27T23:00:00+02:00'],
     ]
   },
-};
+};;
 
 const ALL_TEAMS = Object.values(GROUPS).flatMap(g => g.teams).sort((a,b) => a.localeCompare(b, 'nl'));
 
@@ -1344,7 +1485,7 @@ function toggleParticipantDetail(name) {
 
   // ── Groepsfase: alle wedstrijden per groep ──
   const groupSection = Object.entries(GROUPS).map(([group, gdata]) => {
-    const rows = gdata.matches.map(([a, b, date]) => {
+    const rows = gdata.matches.map(([a, b, date, time]) => {
       const key = matchKey(group, a, b);
       const pred = p.scores?.[key];
       const actual = results.matches?.[key];
@@ -1371,7 +1512,7 @@ function toggleParticipantDetail(name) {
 
       return `<div class="detail-match-row">
         <span class="detail-match-teams">${a.replace('*','')} vs ${b.replace('*','')}</span>
-        <span class="detail-match-date">${date}</span>
+        <span class="detail-match-date">${date} ${time}</span>
         <span class="detail-match-pred">${predStr}</span>
         <span class="detail-match-actual" style="color:var(--fg-muted)">${actualStr}</span>
         <span class="detail-match-result" style="color:${resultColor}">${resultLabel}</span>
@@ -1608,13 +1749,13 @@ function buildPredictForm() {
     div.className = 'tab-content' + (idx === 0 ? ' active' : '');
     div.innerHTML = `
       <div class="matches-grid">
-        ${gdata.matches.map(([a, b, date]) => {
+        ${gdata.matches.map(([a, b, date, time]) => {
           const key = matchKey(group, a, b);
           const aIsPlaceholder = a.endsWith('*');
           const bIsPlaceholder = b.endsWith('*');
           return `
             <div class="match-card">
-              <div class="group-label">Groep ${group} &nbsp;·&nbsp; ${date}</div>
+              <div class="group-label">Groep ${group} &nbsp;·&nbsp; ${date} &nbsp;·&nbsp; ${time}</div>
               <div class="match-teams">
                 <div class="team-name${aIsPlaceholder ? ' placeholder-team' : ''}">${a.replace('*','')}</div>
                 <div class="vs-divider">VS</div>
@@ -1714,15 +1855,64 @@ function buildBracketRound(containerId, round, savedKnockout) {
     const optsB = teamOptions(phA, phB, 'b').replace(`value="${valB}"`, `value="${valB}" selected`);
     html += `<div class="bracket-match">
       <div class="bracket-match-label">${label}</div>
-      <select id="bk_${round}_${i}_a" onchange="saveBracketPick()">${optsA}</select>
+      <select id="bk_${round}_${i}_a" onchange="saveBracketPick('${round}')">${optsA}</select>
       <div class="bracket-vs">vs</div>
-      <select id="bk_${round}_${i}_b" onchange="saveBracketPick()">${optsB}</select>
+      <select id="bk_${round}_${i}_b" onchange="saveBracketPick('${round}')">${optsB}</select>
     </div>`;
   });
   el.innerHTML = html;
 }
 
-function saveBracketPick() { /* state collected on submit */ }
+const DEADLINE = new Date('2026-06-11T18:00:00Z'); // 20:00 NL = 18:00 UTC
+
+function isDeadlinePassed() {
+  return new Date() > DEADLINE;
+}
+
+function checkDeadlineAndBlock() {
+  if (!isDeadlinePassed()) return false;
+  // Hide form, show message
+  const form = document.getElementById('view-voorspel');
+  if (form) {
+    const btn = form.querySelector('button.btn-primary');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '⏱ Inschrijving gesloten';
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
+    }
+    let banner = document.getElementById('deadline-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'deadline-banner';
+      banner.style.cssText = 'background:var(--red);color:#fff;padding:14px 20px;margin-bottom:20px;' +
+        'font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;';
+      banner.textContent = '⏱ De inschrijftermijn is verlopen op 11 juni 2026 om 20:00 uur (NL tijd). Het is niet meer mogelijk een formulier in te sturen.';
+      form.insertBefore(banner, form.firstChild);
+    }
+  }
+  return true;
+}
+
+function saveBracketPick(round) {
+  // Validate: no duplicate teams within a round
+  const count = BRACKET_MATCH_COUNTS[round];
+  const seen = {};
+  for (let i = 0; i < count; i++) {
+    for (const side of ['a', 'b']) {
+      const val = document.getElementById(`bk_${round}_${i}_${side}`)?.value;
+      if (!val) continue;
+      const key = `bk_${round}_${i}_${side}`;
+      if (seen[val]) {
+        // Reset this select to empty
+        document.getElementById(key).value = '';
+        showToast(`${val} staat al in deze ronde`, true);
+        return;
+      }
+      seen[val] = key;
+    }
+  }
+}
 
 function readBracketRoundById(containerId, round) {
   const count = BRACKET_MATCH_COUNTS[round];
@@ -1772,9 +1962,10 @@ function switchGroupTab(group, prefix) {
 }
 
 async function submitPredictions() {
+  if (isDeadlinePassed()) { showToast('De inschrijftermijn is verlopen', true); return; }
   const name = document.getElementById('predict-name').value.trim();
   const email = document.getElementById('predict-email').value.trim();
-  if (!name) { showToast('Vul eerst je naam in', true); return; }
+  if (!name) { showToast('Vul eerst je voor- en achternaam in', true); return; }
   if (!email || !email.includes('@')) { showToast('Vul een geldig e-mailadres in', true); return; }
 
   if (participants.find(p => p.name.toLowerCase() === name.toLowerCase())) {
@@ -1862,14 +2053,14 @@ function buildAdminPanel() {
     const div = document.createElement('div');
     div.id = `admin-group-${group}`;
     div.className = 'tab-content' + (idx === 0 ? ' active' : '');
-    div.innerHTML = gdata.matches.map(([a, b, date]) => {
+    div.innerHTML = gdata.matches.map(([a, b, date, time]) => {
       const key = matchKey(group, a, b);
       const saved = results.matches?.[key] || {};
       const aLabel = a.replace('*','') + (a.endsWith('*') ? ' (play-off)' : '');
       const bLabel = b.replace('*','') + (b.endsWith('*') ? ' (play-off)' : '');
       return `
         <div class="result-match">
-          <div class="result-team">${aLabel}<div style="font-size:10px;color:var(--fg-muted);letter-spacing:1px;font-weight:400">${date}</div></div>
+          <div class="result-team">${aLabel}<div style="font-size:10px;color:var(--fg-muted);letter-spacing:1px;font-weight:400">${date} · ${time}</div></div>
           <div class="result-score-inputs">
             <input type="number" min="0" max="20" id="res_${key}_a" value="${saved.a ?? ''}" placeholder="0">
             <span style="font-family:'Bebas Neue';font-size:20px;color:var(--fg-muted)">—</span>
@@ -1970,24 +2161,16 @@ async function deleteAnnouncement(id) {
 // VOLGENDE WEDSTRIJD
 // =============================================
 function getNextMatch() {
-  // Build a flat list of all group matches in date order
-  // Date format: "11 jun" — convert to sortable number (day + month offset)
-  const MONTH_ORDER = { 'jun': 6, 'jul': 7 };
-
   const all = [];
   for (const [group, gdata] of Object.entries(GROUPS)) {
-    for (const [a, b, date] of gdata.matches) {
+    for (const [a, b, date, time, iso] of gdata.matches) {
       const key = matchKey(group, a, b);
       const played = results.matches?.[key]?.played || false;
-      const [day, mon] = date.split(' ');
-      const sortKey = (MONTH_ORDER[mon] || 6) * 100 + parseInt(day);
-      all.push({ group, a, b, date, key, played, sortKey });
+      const dt = iso ? new Date(iso) : new Date(`2026-06-11`);
+      all.push({ group, a, b, date, time, iso, key, played, dt });
     }
   }
-
-  all.sort((x, y) => x.sortKey - y.sortKey);
-
-  // Return first unplayed match
+  all.sort((x, y) => x.dt - y.dt);
   return all.find(m => !m.played) || null;
 }
 
@@ -2043,7 +2226,7 @@ function renderNextMatch() {
       <div class="next-match-fixture">
         <div class="next-match-team">${match.a.replace('*','')}</div>
         <div class="next-match-vs">
-          <div class="next-match-date">${match.date}</div>
+          <div class="next-match-date">${match.date} · ${match.time || ''}</div>
           <div style="font-family:'Bebas Neue';font-size:28px;color:var(--fg-muted);letter-spacing:3px">VS</div>
           <div style="font-family:'Barlow Condensed';font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase">Groep ${match.group}</div>
         </div>
@@ -2124,7 +2307,7 @@ function changePassword() {
 // =============================================
 // UI HULPFUNCTIES
 // =============================================
-const viewMap = { aankondigingen: 0, ranglijst: 1, voorspel: 2, admin: 3 };
+const viewMap = { aankondigingen: 0, ranglijst: 1, spelregels: 2, voorspel: 3 };
 
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -2133,6 +2316,7 @@ function showView(id) {
   if (viewMap[id] !== undefined) document.querySelectorAll('.nav-btn')[viewMap[id]].classList.add('active');
   if (id === 'ranglijst') renderLeaderboard();
   if (id === 'aankondigingen') renderNextMatch();
+  if (id === 'voorspel') checkDeadlineAndBlock();
 }
 
 function showToast(msg, isError = false) {
@@ -2154,6 +2338,7 @@ function showToast(msg, isError = false) {
   buildPredictForm();
   renderLeaderboard();
   renderNextMatch();
+  checkDeadlineAndBlock();
 })();
 </script>
 </body>
