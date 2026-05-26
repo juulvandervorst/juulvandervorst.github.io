@@ -83,7 +83,7 @@
 
   /* ====== THEME TOGGLE ====== */
   .theme-toggle {
-    position: fixed; top: 16px; right: 20px; z-index: 1000;
+    position: fixed; top: 16px; left: 20px; z-index: 1000;
     background: var(--card); border: 1px solid var(--border);
     color: var(--fg-muted); padding: 8px 14px;
     font-family: 'Barlow Condensed', sans-serif;
@@ -625,7 +625,7 @@
   <span id="theme-icon">🌙</span>
   <span id="theme-label">Donker</span>
 </button>
-<button class="theme-toggle" style="left:auto;right:20px" onclick="showView('admin')">⚙️ Admin</button>
+<button class="theme-toggle" style="left:auto;right:20px;position:fixed" onclick="showView('admin')">⚙️ Admin</button>
 
 <header>
   <div class="header-image-wrap">
@@ -832,22 +832,20 @@
       </div>
     </div>
 
-    <!-- Groepsfase -->
-    <div class="card">
+    <!-- Groepsfase + Virtuele groepsstand gecombineerd -->
+    <div class="card" id="card-groepsstand">
       <div class="card-title">Groepsfase Voorspellingen</div>
       <div class="tabs" id="group-tabs"></div>
       <div id="group-tab-contents"></div>
+
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+        <div class="card-title" style="margin-bottom:8px">Virtuele Groepsstand</div>
+        <p style="font-size:12px;color:var(--fg-muted);margin-bottom:18px;letter-spacing:0.5px">Bijgewerkt op basis van jouw ingevulde scores. De top-2 per groep gaat automatisch door. Daarnaast kwalificeren de beste acht nummers drie zich ook voor de knock-outfase.</p>
+        <div id="stand-contents"></div>
+      </div>
     </div>
 
-    <!-- Virtuele groepsstand -->
-    <div class="card" id="card-groepsstand">
-      <div class="card-title">Virtuele Groepsstand</div>
-      <p style="font-size:12px;color:var(--fg-muted);margin-bottom:18px;letter-spacing:0.5px">Bijgewerkt op basis van jouw ingevulde scores. De top-2 per groep gaat automatisch door.</p>
-      <div class="tabs" id="stand-tabs"></div>
-      <div id="stand-contents"></div>
-    </div>
-
-    <!-- Knock-outfase -->
+    <!-- Knock-out bracket -->
     <div class="card">
       <div class="card-title">Knock-outfase</div>
       <p style="font-size:12px;color:var(--fg-muted);margin-bottom:20px;letter-spacing:0.5px">
@@ -878,9 +876,9 @@
       <div class="bracket-grid" id="bracket-final"></div>
     </div>
 
-    <!-- Extra Vragen -->
+    <!-- Speciale picks -->
     <div class="card">
-      <div class="card-title">Extra Vragen</div>
+      <div class="card-title">Wereldkampioen 2026 en Bonusvragen</div>
       <div class="special-picks">
         <div class="form-group">
           <label>🏆 Kampioen (30 ptn)</label>
@@ -1491,7 +1489,8 @@ function toggleParticipantDetail(name) {
       <div class="card-title" style="margin:0">Voorspellingen van ${p.name}</div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-secondary" style="padding:6px 14px;font-size:11px"
-          onclick="downloadPredictionsExcel(participants.find(x=>x.name==='${p.name.replace(/'/g,"\'")}')))">⬇ Excel</button>
+          onclick="downloadPredictionsExcel(participants.find(x=>x.name===this.dataset.name))"
+          data-name="${p.name}">⬇ Excel</button>
         <button class="btn btn-secondary" style="padding:6px 14px;font-size:11px"
           onclick="document.getElementById('participant-detail-panel').classList.remove('open');
                    document.getElementById('participant-detail-panel').dataset.open=''">Sluiten</button>
@@ -1658,25 +1657,13 @@ function getBest8ThirdPlace() {
 }
 
 function buildStandingTabs() {
-  const tabsEl = document.getElementById('stand-tabs');
+  // Geen aparte tabs: de stand zit nu in hetzelfde blokje als de groepsuitslagen.
+  // Maak per groep een verborgen container aan; switchGroupTab toont de juiste.
   const contentsEl = document.getElementById('stand-contents');
-  if (!tabsEl) return;
-  tabsEl.innerHTML = '';
+  if (!contentsEl) return;
   contentsEl.innerHTML = '';
 
   Object.keys(GROUPS).forEach((group, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
-    btn.textContent = `Groep ${group}`;
-    btn.id = `stand-tab-${group}`;
-    btn.onclick = () => {
-      document.querySelectorAll('#stand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('#stand-contents .tab-content').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(`stand-${group}`).classList.add('active');
-    };
-    tabsEl.appendChild(btn);
-
     const div = document.createElement('div');
     div.id = `stand-${group}`;
     div.className = 'tab-content' + (idx === 0 ? ' active' : '');
@@ -1764,16 +1751,7 @@ function buildPredictForm() {
     const btn = document.createElement('button');
     btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
     btn.textContent = `Groep ${group}`;
-    btn.onclick = () => {
-      switchGroupTab(group, 'pred');
-      // Sync standing tab to the same group
-      document.querySelectorAll('#stand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('#stand-contents .tab-content').forEach(c => c.classList.remove('active'));
-      const st = document.getElementById(`stand-tab-${group}`);
-      const sc = document.getElementById(`stand-${group}`);
-      if (st) st.classList.add('active');
-      if (sc) sc.classList.add('active');
-    };
+    btn.onclick = () => switchGroupTab(group, 'pred');
     tabsEl.appendChild(btn);
 
     const div = document.createElement('div');
@@ -1905,7 +1883,6 @@ function autoFillR32() {
   const best8set = new Set(best8thirds.map(t => t.group));
 
   // Officiële slot-toewijzing voor nummers drie per wedstrijd
-  // De kandidaat-groepen per slot (in volgorde van prioriteit bij meerdere kandidaten)
   const thirdSlotGroups = {
     1:  ['A','B','C','D','F'],  // W74
     4:  ['C','D','F','G','H'],  // W77
@@ -1916,26 +1893,31 @@ function autoFillR32() {
     12: ['E','F','G','I','J'],  // W85
     14: ['D','E','I','J','L'],  // W87
   };
+  const slotIndices = Object.keys(thirdSlotGroups).map(Number);
 
-  // Wijs beste beschikbare nr3 toe per slot (greedy)
-  const assignedThirds = {}; // slotIdx → team
-  const usedThirds = new Set();
+  // Gebruik backtracking om een geldige toewijzing te vinden
+  // waarbij elke nr3-groep precies één slot krijgt
+  const assignedThirds = {};
 
-  // Sorteer slots op prioriteit (beste beschikbare nr3 eerst toewijzen aan slots)
-  // We gaan door de best8thirds in volgorde en wijzen ze toe aan het eerste beschikbare slot
-  const slotIndices = Object.keys(thirdSlotGroups).map(Number).sort((a,b) => a-b);
-
-  // Voor elk best8-derde in volgorde van kwaliteit: zoek eerste slot waar hun groep past
-  for (const t of best8thirds) {
-    for (const slotIdx of slotIndices) {
-      if (assignedThirds[slotIdx]) continue; // al ingevuld
-      if (thirdSlotGroups[slotIdx].includes(t.group)) {
-        assignedThirds[slotIdx] = t.team;
-        usedThirds.add(t.group);
-        break;
+  function assignThirds(thirdsLeft, slotsLeft) {
+    if (slotsLeft.length === 0) return true; // alle slots gevuld
+    const slot = slotsLeft[0];
+    const remaining = slotsLeft.slice(1);
+    // Probeer elke beschikbare nr3 voor dit slot (beste eerst)
+    for (const t of thirdsLeft) {
+      if (thirdSlotGroups[slot].includes(t.group)) {
+        assignedThirds[slot] = t.team;
+        const newLeft = thirdsLeft.filter(x => x.group !== t.group);
+        if (assignThirds(newLeft, remaining)) return true;
+        delete assignedThirds[slot];
       }
     }
+    // Geen geldige nr3 voor dit slot — laat leeg en ga door
+    if (assignThirds(thirdsLeft, remaining)) return true;
+    return false;
   }
+
+  assignThirds(best8thirds, slotIndices);
 
   // Definieer de 16 R32-wedstrijden met hun teams
   // Formaat: [slotIdx, teamA_fn, teamB_fn]
@@ -2114,6 +2096,13 @@ function switchGroupTab(group, prefix) {
   const contentEl = document.getElementById(`${prefix}-group-${group}`);
   if (tabEl) tabEl.classList.add('active');
   if (contentEl) contentEl.classList.add('active');
+
+  // Synchroniseer de stand direct mee (alleen voor het invulformulier)
+  if (prefix === 'pred') {
+    document.querySelectorAll('#stand-contents .tab-content').forEach(c => c.classList.remove('active'));
+    const standEl = document.getElementById(`stand-${group}`);
+    if (standEl) standEl.classList.add('active');
+  }
 }
 
 async function submitPredictions() {
