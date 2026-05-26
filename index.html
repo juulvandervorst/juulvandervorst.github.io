@@ -613,8 +613,6 @@
   .stand-badge-direct { background: rgba(0,61,165,0.25); color: var(--accent); border: 1px solid rgba(0,61,165,0.4); }
   .stand-badge-third  { background: rgba(245,166,35,0.2); color: var(--gold); border: 1px solid rgba(245,166,35,0.4); }
 
-  /* ====== ADMIN PW CHANGE ====== */
-  #admin-pw-change { display: none; }
 </style>
 </head>
 <body>
@@ -931,11 +929,17 @@
     <div id="admin-gate">
       <div class="password-gate">
         <div class="section-title">Admin Toegang</div>
-        <p style="color:var(--fg-muted);font-size:13px;margin-bottom:24px">Voer het beheerderswachtwoord in om uitslagen te beheren</p>
+        <p style="color:var(--fg-muted);font-size:13px;margin-bottom:24px">Log in met je Supabase-account om het beheerderspaneel te openen.</p>
         <div class="form-group">
+          <label>E-mailadres</label>
+          <input type="email" id="admin-email" placeholder="jouw@email.nl" onkeydown="if(event.key==='Enter')document.getElementById('admin-password').focus()">
+        </div>
+        <div class="form-group">
+          <label>Wachtwoord</label>
           <input type="password" id="admin-password" placeholder="Wachtwoord..." onkeydown="if(event.key==='Enter')checkAdminPassword()">
         </div>
-        <button class="btn btn-primary" onclick="checkAdminPassword()">Toegang Krijgen</button>
+        <div id="admin-login-error" style="display:none;color:var(--red);font-size:13px;margin-bottom:12px;padding:8px 12px;background:rgba(200,16,46,0.08);border:1px solid rgba(200,16,46,0.2)"></div>
+        <button class="btn btn-primary" id="admin-login-btn" onclick="checkAdminPassword()">Inloggen</button>
       </div>
     </div>
 
@@ -952,7 +956,6 @@
         <button class="btn btn-primary" onclick="saveResults()">💾 Alles Opslaan</button>
         <button class="btn btn-secondary" onclick="exportData()">📤 Exporteer Data</button>
         <button class="btn btn-danger" onclick="clearAllParticipants()">🗑 Deelnemers Wissen</button>
-        <button class="btn btn-secondary" onclick="showAdminPasswordChange()">🔑 Wachtwoord Wijzigen</button>
       </div>
 
       <div class="card">
@@ -977,17 +980,7 @@
         <div id="admin-announcements-list"></div>
       </div>
 
-      <div id="admin-pw-change" class="card">
-        <div class="card-title">Wachtwoord Wijzigen</div>
-        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-          <div class="form-group" style="flex:1;min-width:200px;margin:0">
-            <label>Nieuw wachtwoord</label>
-            <input type="password" id="new-pw" placeholder="Nieuw wachtwoord...">
-          </div>
-          <button class="btn btn-primary" onclick="changePassword()">Opslaan</button>
-          <button class="btn btn-secondary" onclick="document.getElementById('admin-pw-change').style.display='none'">Annuleren</button>
-        </div>
-      </div>
+
 
       <div class="card">
         <div class="card-title">Wedstrijduitslagen — Groepsfase</div>
@@ -1199,14 +1192,94 @@ const LIMITS = { r32: 32, r16: 16, qf: 8, sf: 4, final: 2 };
 const SUPABASE_URL = 'https://dxarhjhjgdmlsnpqzkjp.supabase.co';       // bijv. https://xyzxyz.supabase.co
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4YXJoamhqZ2RtbHNucHF6a2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MjQ4OTMsImV4cCI6MjA5MDAwMDg5M30.Y8Y-lm7hrmcFHhI92BpFXCkwqoWykTaa-QyzL-ESxOw'; // begint met eyJ...
 
+// =============================================
+// SUPABASE AUTH
+// =============================================
+let authSession = null; // { access_token, refresh_token, expires_at }
+
+async function sbAuth(email, password) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error_description || data.msg || 'Inloggen mislukt');
+  return data; // { access_token, refresh_token, expires_in, token_type }
+}
+
+async function sbAuthRefresh(refreshToken) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: refreshToken })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error('Sessie verlopen');
+  return data;
+}
+
+async function sbAuthLogout() {
+  if (!authSession) return;
+  try {
+    await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${authSession.access_token}` }
+    });
+  } catch(e) {}
+  authSession = null;
+  sessionStorage.removeItem('wkf_auth_session');
+}
+
+function getAuthToken() {
+  return authSession?.access_token || SUPABASE_ANON_KEY;
+}
+
+function saveSession(session) {
+  authSession = {
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+    expires_at: Date.now() + (session.expires_in * 1000)
+  };
+  sessionStorage.setItem('wkf_auth_session', JSON.stringify(authSession));
+}
+
+function loadSession() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem('wkf_auth_session'));
+    if (s && s.access_token && s.expires_at > Date.now()) {
+      authSession = s;
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+async function ensureValidToken() {
+  if (!authSession) return false;
+  // Vernieuw token als het binnen 5 minuten verloopt
+  if (authSession.expires_at - Date.now() < 5 * 60 * 1000) {
+    try {
+      const refreshed = await sbAuthRefresh(authSession.refresh_token);
+      saveSession(refreshed);
+    } catch(e) {
+      authSession = null;
+      sessionStorage.removeItem('wkf_auth_session');
+      return false;
+    }
+  }
+  return true;
+}
+
 // Hulpfunctie voor Supabase REST API aanroepen
 async function sb(path, options = {}) {
   const { headers: extraHeaders, prefer, body, method } = options;
+  const token = getAuthToken();
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     method: method || 'GET',
     headers: {
       'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
       'Prefer': prefer || 'return=representation',
       ...extraHeaders
@@ -1309,6 +1382,9 @@ async function saveResults() {
   results.first_scorer = document.getElementById('admin-first-scorer').value.trim();
   results.last_scorer = document.getElementById('admin-last-scorer').value.trim();
 
+  const tokenOk = await ensureValidToken();
+  if (!tokenOk) { showToast('Sessie verlopen, log opnieuw in', true); lockAdmin(); return; }
+
   try {
     await sb('results?id=eq.1', {
       method: 'PATCH',
@@ -1341,9 +1417,7 @@ async function clearAllParticipants() {
   }
 }
 
-function getAdminPassword() {
-  return localStorage.getItem('wkf_nl_admin_pw') || 'admin2026';
-}
+// getAdminPassword verwijderd — auth via Supabase Auth
 
 // =============================================
 // THEME TOGGLE
@@ -2210,23 +2284,50 @@ async function submitPredictions() {
 // =============================================
 // ADMIN
 // =============================================
-function checkAdminPassword() {
+async function checkAdminPassword() {
+  const email = document.getElementById('admin-email').value.trim();
   const pw = document.getElementById('admin-password').value;
-  if (pw === getAdminPassword()) {
+  const errEl = document.getElementById('admin-login-error');
+  const btnEl = document.getElementById('admin-login-btn');
+
+  if (!email || !pw) {
+    errEl.textContent = 'Vul je e-mailadres en wachtwoord in.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btnEl.textContent = 'Bezig met inloggen...';
+  btnEl.disabled = true;
+  errEl.style.display = 'none';
+
+  try {
+    const session = await sbAuth(email, pw);
+    saveSession(session);
     adminUnlocked = true;
     document.getElementById('admin-gate').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
+    document.getElementById('admin-password').value = '';
     buildAdminPanel();
-  } else {
-    showToast('Onjuist wachtwoord', true);
+    showToast('Ingelogd als beheerder ✓');
+  } catch(e) {
+    errEl.textContent = e.message === 'Invalid login credentials'
+      ? 'Onjuist e-mailadres of wachtwoord.'
+      : `Inloggen mislukt: ${e.message}`;
+    errEl.style.display = 'block';
+  } finally {
+    btnEl.textContent = 'Inloggen';
+    btnEl.disabled = false;
   }
 }
 
-function lockAdmin() {
+async function lockAdmin() {
+  await sbAuthLogout();
   adminUnlocked = false;
   document.getElementById('admin-gate').style.display = 'block';
   document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-email').value = '';
   document.getElementById('admin-password').value = '';
+  showToast('Uitgelogd ✓');
 }
 
 function buildAdminPanel() {
@@ -2310,6 +2411,8 @@ async function addAnnouncement() {
   const body = document.getElementById('ann-body').value.trim();
   if (!title) { showToast('Vul een titel in', true); return; }
   if (!body)  { showToast('Vul een bericht in', true); return; }
+  const tokenOk = await ensureValidToken();
+  if (!tokenOk) { showToast('Sessie verlopen, log opnieuw in', true); lockAdmin(); return; }
 
   const ann = { title, body, created: new Date().toISOString() };
   try {
@@ -2340,6 +2443,8 @@ async function addAnnouncement() {
 
 async function deleteAnnouncement(id) {
   if (!confirm('Deze aankondiging verwijderen?')) return;
+  const tokenOk = await ensureValidToken();
+  if (!tokenOk) { showToast('Sessie verlopen, log opnieuw in', true); lockAdmin(); return; }
   try {
     await sb(`announcements?id=eq.${id}`, { method: 'DELETE' });
   } catch(e) { /* fallback */ }
@@ -2558,17 +2663,7 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
-function showAdminPasswordChange() {
-  document.getElementById('admin-pw-change').style.display = 'block';
-}
-
-function changePassword() {
-  const pw = document.getElementById('new-pw').value;
-  if (!pw) { showToast('Voer een wachtwoord in', true); return; }
-  localStorage.setItem('wkf_nl_admin_pw', pw);
-  document.getElementById('admin-pw-change').style.display = 'none';
-  showToast('Wachtwoord bijgewerkt ✓');
-}
+// changePassword verwijderd — wachtwoord beheer via Supabase dashboard
 
 // =============================================
 // UI HULPFUNCTIES
@@ -2599,12 +2694,20 @@ function showToast(msg, isError = false) {
   document.getElementById('leaderboard-body').innerHTML =
     `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--fg-muted);letter-spacing:2px;font-family:'Barlow Condensed';text-transform:uppercase;font-size:13px">Verbinden met database...</td></tr>`;
 
+  // Herstel bestaande admin-sessie als die nog geldig is
+  if (loadSession()) {
+    adminUnlocked = true;
+    document.getElementById('admin-gate').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+  }
+
   await loadState();
   await loadAnnouncements();
   buildPredictForm();
   renderLeaderboard();
   renderNextMatch();
   checkDeadlineAndBlock();
+  if (adminUnlocked) buildAdminPanel();
 })();
 </script>
 </body>
