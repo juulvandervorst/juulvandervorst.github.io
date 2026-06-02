@@ -2430,22 +2430,30 @@ const ANNEX_C_LOOKUP = {
 // =============================================
 // AUTO-FILL RONDE VAN 32 — officiële FIFA Annex C
 // =============================================
-// Kolommen in ANNEX_C_LOOKUP: [W74, W85, W81, W79, W82, W77, W87, W80]
-// = Slots:                    [  1,  12,   8,   6,   9,   4,  14,   7]
+// Kolomnamen in de Annex C tabel zijn de WINNAAR die de nr3 als tegenstander krijgt:
+//   Kolom 1A = Winnaar A speelt in W79 → W79 krijgt de nr3 uit kolom 1A
+//   Kolom 1B = Winnaar B speelt in W85 → W85 krijgt de nr3 uit kolom 1B
+//   Kolom 1D = Winnaar D speelt in W81 → W81 krijgt de nr3 uit kolom 1D
+//   Kolom 1E = Winnaar E speelt in W74 → W74 krijgt de nr3 uit kolom 1E
+//   Kolom 1G = Winnaar G speelt in W82 → W82 krijgt de nr3 uit kolom 1G
+//   Kolom 1I = Winnaar I speelt in W77 → W77 krijgt de nr3 uit kolom 1I
+//   Kolom 1K = Winnaar K speelt in W87 → W87 krijgt de nr3 uit kolom 1K
+//   Kolom 1L = Winnaar L speelt in W80 → W80 krijgt de nr3 uit kolom 1L
+//
+// COL_TO_IDX: index in r32Assignments array per kolom [1A, 1B, 1D, 1E, 1G, 1I, 1K, 1L]
+const COL_TO_IDX = [6, 12, 8, 1, 9, 4, 14, 7];
+//                  W79 W85 W81 W74 W82 W77 W87 W80
 
 function resolveThirdPlaceSlots(qualGroups) {
   const key = [...qualGroups].sort().join('');
   const vals = ANNEX_C_LOOKUP[key];
-  if (!vals) return {}; // combinatie niet gevonden (zou niet mogen)
-  // Kolom-naar-slot-index mapping: [W74=1, W85=12, W81=8, W79=6, W82=9, W77=4, W87=14, W80=7]
-  const COL_TO_IDX = [1, 12, 8, 6, 9, 4, 14, 7];
+  if (!vals) return {};
   const assigned = {};
   COL_TO_IDX.forEach((idx, col) => { assigned[idx] = vals[col]; });
   return assigned;
 }
 
 function autoFillR32() {
-  // Bereken standen op basis van ingevulde groepsuitslagen
   const standings = {};
   for (const group of Object.keys(GROUPS)) {
     standings[group] = calcGroupStanding(group);
@@ -2455,7 +2463,6 @@ function autoFillR32() {
     return standings[group]?.[pos]?.team || '';
   }
 
-  // Check of er minstens 1 wedstrijd ingevuld is
   const hasAnyScores = Object.keys(GROUPS).some(g =>
     GROUPS[g].matches.some(([a, b]) => {
       const el = document.getElementById(`pred_${matchKey(g, a, b)}_a`);
@@ -2467,7 +2474,6 @@ function autoFillR32() {
     return;
   }
 
-  // Bereken de beste 8 nummers drie (FIFA art. 13: punten → doelsaldo → doelpunten)
   const thirds = Object.keys(GROUPS).map(g => ({
     team:  standings[g]?.[2]?.team || '',
     group: g,
@@ -2484,9 +2490,7 @@ function autoFillR32() {
   const qualGroups = new Set(best8.map(t => t.group));
   const thirdByGroup = Object.fromEntries(best8.map(t => [t.group, t.team]));
 
-  // Officiële FIFA Annex C slot-toewijzing (exacte lookup)
   const slotAssignment = resolveThirdPlaceSlots(qualGroups);
-  // slotAssignment: { r32-slot-index → groepsletter van nr3 }
 
   function nr3(r32Idx) {
     const g = slotAssignment[r32Idx];
@@ -2495,25 +2499,24 @@ function autoFillR32() {
 
   // De 16 R32-wedstrijden (artikel 12.6, pagina 23 FIFA reglement)
   const r32Assignments = [
-    [0,  getTeam('A',1), getTeam('B',1)],  // W73: 2e A vs 2e B
-    [1,  getTeam('E',0), nr3(1)         ],  // W74: Win E vs nr3 (A/B/C/D/F)
-    [2,  getTeam('F',0), getTeam('C',1)],  // W75: Win F vs 2e C
-    [3,  getTeam('C',0), getTeam('F',1)],  // W76: Win C vs 2e F
-    [4,  getTeam('I',0), nr3(4)         ],  // W77: Win I vs nr3 (C/D/F/G/H)
-    [5,  getTeam('E',1), getTeam('I',1)],  // W78: 2e E vs 2e I
-    [6,  getTeam('A',0), nr3(6)         ],  // W79: Win A vs nr3 (C/E/F/H/I)
-    [7,  getTeam('L',0), nr3(7)         ],  // W80: Win L vs nr3 (E/H/I/J/K)
-    [8,  getTeam('D',0), nr3(8)         ],  // W81: Win D vs nr3 (B/E/F/I/J)
-    [9,  getTeam('G',0), nr3(9)         ],  // W82: Win G vs nr3 (A/E/H/I/J)
-    [10, getTeam('K',1), getTeam('L',1)],  // W83: 2e K vs 2e L
-    [11, getTeam('H',0), getTeam('J',1)],  // W84: Win H vs 2e J
-    [12, getTeam('B',0), nr3(12)        ],  // W85: Win B vs nr3 (E/F/G/I/J)
-    [13, getTeam('J',0), getTeam('H',1)],  // W86: Win J vs 2e H
-    [14, getTeam('K',0), nr3(14)        ],  // W87: Win K vs nr3 (D/E/I/J/L)
-    [15, getTeam('D',1), getTeam('G',1)],  // W88: 2e D vs 2e G
+    [0,  getTeam('A',1), getTeam('B',1)],  // W73: 2A vs 2B
+    [1,  getTeam('E',0), nr3(1)         ],  // W74: 1E vs nr3 (Annex C kolom 1E)
+    [2,  getTeam('F',0), getTeam('C',1)],  // W75: 1F vs 2C
+    [3,  getTeam('C',0), getTeam('F',1)],  // W76: 1C vs 2F
+    [4,  getTeam('I',0), nr3(4)         ],  // W77: 1I vs nr3 (Annex C kolom 1I)
+    [5,  getTeam('E',1), getTeam('I',1)],  // W78: 2E vs 2I
+    [6,  getTeam('A',0), nr3(6)         ],  // W79: 1A vs nr3 (Annex C kolom 1A)
+    [7,  getTeam('L',0), nr3(7)         ],  // W80: 1L vs nr3 (Annex C kolom 1L)
+    [8,  getTeam('D',0), nr3(8)         ],  // W81: 1D vs nr3 (Annex C kolom 1D)
+    [9,  getTeam('G',0), nr3(9)         ],  // W82: 1G vs nr3 (Annex C kolom 1G)
+    [10, getTeam('K',1), getTeam('L',1)],  // W83: 2K vs 2L
+    [11, getTeam('H',0), getTeam('J',1)],  // W84: 1H vs 2J
+    [12, getTeam('B',0), nr3(12)        ],  // W85: 1B vs nr3 (Annex C kolom 1B)
+    [13, getTeam('J',0), getTeam('H',1)],  // W86: 1J vs 2H
+    [14, getTeam('K',0), nr3(14)        ],  // W87: 1K vs nr3 (Annex C kolom 1K)
+    [15, getTeam('D',1), getTeam('G',1)],  // W88: 2D vs 2G
   ];
 
-  // Vul de dropdowns in
   let filled = 0;
   for (const [i, teamA, teamB] of r32Assignments) {
     const selA = document.getElementById(`bk_r32_${i}_a`);
@@ -2522,7 +2525,6 @@ function autoFillR32() {
     if (selB && teamB) { selB.value = teamB; filled++; }
   }
 
-  // Valideer op duplicaten binnen de ronde
   saveBracketPick('r32');
   renderAllStandings();
 
