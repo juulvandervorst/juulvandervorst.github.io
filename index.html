@@ -195,28 +195,6 @@
     background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold)); opacity: 0.7;
   }
 
-  /* ====== LINE CHART ====== */
-  .chart-wrap {
-    width: 100%; overflow-x: auto; margin-bottom: 8px;
-  }
-  #score-chart-svg {
-    display: block; width: 100%; min-width: 420px;
-  }
-  .chart-line { fill: none; stroke-width: 2; transition: opacity 0.2s, stroke-width 0.2s; cursor: pointer; }
-  .chart-line.dimmed { opacity: 0.13; }
-  .chart-line.top1 { stroke-width: 3; }
-  .chart-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; }
-  .chart-legend-item {
-    display: flex; align-items: center; gap: 6px; font-size: 12px;
-    font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; cursor: pointer;
-    padding: 4px 8px; border: 1px solid transparent; transition: all 0.15s;
-  }
-  .chart-legend-item:hover { border-color: var(--border); }
-  .chart-legend-item.dimmed { opacity: 0.35; }
-  .chart-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .chart-legend-item.top1 .chart-legend-dot { width: 12px; height: 12px; }
-  .chart-no-data { text-align: center; padding: 40px; color: var(--fg-muted); font-size: 13px; letter-spacing: 1px; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
-
   /* ====== STATS GRID ====== */
   .stats-grid {
     display: grid;
@@ -730,15 +708,6 @@
     </div>
 
     <div class="info-strip" id="stats-strip"></div>
-
-    <!-- Score verloop chart — alleen tonen als er wedstrijden gespeeld zijn -->
-    <div id="score-chart-wrap" class="card" style="display:none">
-      <div class="card-title">Score verloop</div>
-      <div class="chart-wrap">
-        <svg id="score-chart-svg" viewBox="0 0 900 300" preserveAspectRatio="xMidYMid meet"></svg>
-      </div>
-      <div class="chart-legend" id="score-chart-legend"></div>
-    </div>
 
     <div class="card">
       <table class="leaderboard-table">
@@ -1616,7 +1585,6 @@ function renderLeaderboard() {
     <div class="info-pill"><span>${scored[0]?.name || '—'}</span><label>Huidige leider</label></div>
     <div class="info-pill"><span>${scored[0]?.total || 0}</span><label>Topscore</label></div>
   `;
-  renderScoreChart();
 }
 
 function toggleParticipantDetail(name) {
@@ -3240,10 +3208,7 @@ function showView(id) {
   if (id === 'ranglijst') renderLeaderboard();
   if (id === 'aankondigingen') renderNextMatch();
   if (id === 'voorspel') checkDeadlineAndBlock();
-  if (id === 'statistieken') {
-    if (!isPastDeadline()) { showView('aankondigingen'); return; }
-    renderStatistieken();
-  }
+  if (id === 'statistieken') renderStatistieken();
 }
 
 function showToast(msg, isError = false) {
@@ -3256,185 +3221,8 @@ function showToast(msg, isError = false) {
 // =============================================
 // SCORE VERLOOP CHART
 // =============================================
-function renderScoreChart() {
-  const chartWrap = document.getElementById('score-chart-wrap');
-  const svg = document.getElementById('score-chart-svg');
-  const legend = document.getElementById('score-chart-legend');
-  if (!chartWrap || !svg || !legend) return;
-
-  // Collect all played matches sorted by their ISO datetime
-  const playedMatches = [];
-  for (const [group, gdata] of Object.entries(GROUPS)) {
-    for (const [a, b, date, time, iso] of gdata.matches) {
-      const key = matchKey(group, a, b);
-      const actual = results.matches?.[key];
-      if (actual && actual.played) {
-        playedMatches.push({ key, iso: iso || `2026-06-${date}`, date, time });
-      }
-    }
-  }
-  playedMatches.sort((a, b) => a.iso.localeCompare(b.iso));
-
-  if (playedMatches.length === 0) {
-    chartWrap.style.display = 'none';
-    return;
-  }
-  chartWrap.style.display = 'block';
-
-  // Build cumulative scores per participant per match-step
-  const scored = participants.map(p => ({ name: p.name, p }));
-
-  // For each step, compute running total for each participant
-  // We compute incrementally
-  const steps = [{ label: 'Start', matchKeys: [] }];
-  // Group matches by date label for x-axis
-  const seenDates = {};
-  for (const m of playedMatches) {
-    const label = m.date;
-    if (!seenDates[label]) {
-      seenDates[label] = true;
-      steps.push({ label, matchKeys: [] });
-    }
-    steps[steps.length - 1].matchKeys.push(m.key);
-  }
-
-  // Compute cumulative totals at each step
-  const series = participants.map(p => {
-    const pts = [];
-    let running = 0;
-    let correctGroup = 0;
-    let exactGroup = 0;
-    pts.push(0);
-    for (let s = 1; s < steps.length; s++) {
-      for (const key of steps[s].matchKeys) {
-        const predicted = p.scores?.[key];
-        const actual = results.matches?.[key];
-        if (!predicted || !actual || !actual.played) continue;
-        const pA = parseInt(predicted.a), pB = parseInt(predicted.b);
-        const rA = parseInt(actual.a), rB = parseInt(actual.b);
-        if (isNaN(pA) || isNaN(pB) || isNaN(rA) || isNaN(rB)) continue;
-        if (pA === rA && pB === rB) { running += POINTS.exact_score; correctGroup++; exactGroup++; }
-        else if (Math.sign(pA - pB) === Math.sign(rA - rB)) { running += POINTS.correct_result; correctGroup++; }
-      }
-      pts.push(running);
-    }
-    return { name: p.name, pts };
-  });
-
-  if (series.length === 0) { chartWrap.style.display = 'none'; return; }
-
-  // Rank by current total (last value)
-  series.sort((a, b) => b.pts[b.pts.length - 1] - a.pts[a.pts.length - 1]);
-
-  // Color palette — top 3 get distinct colors, rest greyed out
-  const TOP_COLORS = ['#F5A623', '#003DA5', '#22c55e'];
-  const DIM_COLOR = 'var(--fg-muted)';
-
-  // SVG dimensions
-  const W = 900, H = 280, PAD = { t: 20, r: 20, b: 40, l: 50 };
-  const cW = W - PAD.l - PAD.r;
-  const cH = H - PAD.t - PAD.b;
-
-  const nSteps = steps.length;
-  const allPts = series.flatMap(s => s.pts);
-  const maxPt = Math.max(...allPts, 1);
-  const minPt = 0;
-
-  const xScale = i => PAD.l + (i / (nSteps - 1)) * cW;
-  const yScale = v => PAD.t + cH - ((v - minPt) / (maxPt - minPt)) * cH;
-
-  // Track which participants are "highlighted" (clicked)
-  const highlighted = new Set();
-
-  function pathData(pts) {
-    return pts.map((v, i) => `${i === 0 ? 'M' : 'L'}${xScale(i).toFixed(1)},${yScale(v).toFixed(1)}`).join(' ');
-  }
-
-  // Build SVG
-  let svgContent = `<defs>
-    <clipPath id="chart-clip"><rect x="${PAD.l}" y="${PAD.t}" width="${cW}" height="${cH}"/></clipPath>
-  </defs>`;
-
-  // Grid lines
-  const gridLines = 4;
-  for (let i = 0; i <= gridLines; i++) {
-    const v = minPt + (i / gridLines) * (maxPt - minPt);
-    const y = yScale(v).toFixed(1);
-    svgContent += `<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
-    svgContent += `<text x="${PAD.l - 6}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="var(--fg-muted)" font-size="10" font-family="Barlow Condensed, sans-serif">${Math.round(v)}</text>`;
-  }
-
-  // X axis labels
-  steps.forEach((s, i) => {
-    const x = xScale(i).toFixed(1);
-    svgContent += `<text x="${x}" y="${H - PAD.b + 16}" text-anchor="middle" fill="var(--fg-muted)" font-size="10" font-family="Barlow Condensed, sans-serif">${i === 0 ? 'Start' : s.label}</text>`;
-  });
-
-  // Lines (greyed first, colored on top)
-  const dimSeries = series.slice(3);
-  const topSeries = series.slice(0, 3).reverse();
-
-  dimSeries.forEach(s => {
-    svgContent += `<path class="chart-line dimmed-default" data-name="${s.name}" d="${pathData(s.pts)}" stroke="var(--fg-muted)" opacity="0.18" clip-path="url(#chart-clip)"/>`;
-  });
-  topSeries.forEach((s, ri) => {
-    const rank = series.indexOf(s);
-    const color = TOP_COLORS[rank] || DIM_COLOR;
-    const isTop = rank === 0;
-    svgContent += `<path class="chart-line${isTop ? ' top1' : ''}" data-name="${s.name}" d="${pathData(s.pts)}" stroke="${color}" clip-path="url(#chart-clip)"/>`;
-    // End dot
-    const lastX = xScale(s.pts.length - 1).toFixed(1);
-    const lastY = yScale(s.pts[s.pts.length - 1]).toFixed(1);
-    svgContent += `<circle cx="${lastX}" cy="${lastY}" r="${isTop ? 5 : 4}" fill="${color}" stroke="var(--card)" stroke-width="2"/>`;
-  });
-
-  svg.innerHTML = svgContent;
-
-  // Legend
-  let legendHTML = '';
-  series.forEach((s, rank) => {
-    const color = rank < 3 ? TOP_COLORS[rank] : 'var(--fg-muted)';
-    const medal = rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : '';
-    const score = s.pts[s.pts.length - 1];
-    legendHTML += `<div class="chart-legend-item${rank === 0 ? ' top1' : ''}${rank >= 3 ? ' dimmed' : ''}" data-name="${s.name}" onclick="toggleChartHighlight('${s.name.replace(/'/g, "\\'")}')">
-      <div class="chart-legend-dot" style="background:${color}"></div>
-      <span>${medal} ${s.name}</span>
-      <span style="color:var(--fg-muted);margin-left:4px">(${score})</span>
-    </div>`;
-  });
-  legend.innerHTML = legendHTML;
-}
-
-let chartHighlighted = null;
-function toggleChartHighlight(name) {
-  const svg = document.getElementById('score-chart-svg');
-  const legend = document.getElementById('score-chart-legend');
-  if (!svg || !legend) return;
-
-  if (chartHighlighted === name) {
-    chartHighlighted = null;
-    svg.querySelectorAll('.chart-line').forEach(l => l.classList.remove('dimmed'));
-    svg.querySelectorAll('.dimmed-default').forEach(l => { l.style.opacity = '0.18'; });
-    legend.querySelectorAll('.chart-legend-item').forEach(l => l.classList.remove('dimmed'));
-  } else {
-    chartHighlighted = name;
-    // Dim all lines except chosen
-    svg.querySelectorAll('.chart-line').forEach(l => {
-      if (l.dataset.name !== name) l.classList.add('dimmed');
-      else l.classList.remove('dimmed');
-    });
-    svg.querySelectorAll('.dimmed-default').forEach(l => {
-      if (l.dataset.name !== name) { l.style.opacity = '0.07'; }
-      else { l.style.opacity = '0.8'; }
-    });
-    legend.querySelectorAll('.chart-legend-item').forEach(l => {
-      if (l.dataset.name !== name) l.classList.add('dimmed');
-      else l.classList.remove('dimmed');
-    });
-  }
-}
-
 // =============================================
+// STATISTIEKEN// =============================================
 // STATISTIEKEN
 // =============================================
 function renderStatistieken() {
@@ -3502,15 +3290,31 @@ function renderStatistieken() {
     </div>`;
   }
 
+  function countGroupScores() {
+    const counts = {};
+    for (const p of participants) {
+      for (const [group, gdata] of Object.entries(GROUPS)) {
+        for (const [a, b] of gdata.matches) {
+          const key = matchKey(group, a, b);
+          const pred = p.scores?.[key];
+          if (!pred || pred.a === '' || pred.b === '') continue;
+          const label = `${parseInt(pred.a)} – ${parseInt(pred.b)}`;
+          counts[label] = (counts[label] || 0) + 1;
+        }
+      }
+    }
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }
+
   const categories = [
     { title: 'Wereldkampioen', icon: '🏆', data: countField('champion') },
     { title: 'Topscorer', icon: '⚽', data: countField('top_scorer') },
-    { title: 'Eerste Doelpuntenmaker', icon: '🥇', data: countField('first_scorer') },
     { title: 'Laatste Doelpuntenmaker', icon: '🏁', data: countField('last_scorer') },
     { title: 'Finalisten', icon: '🎖️', data: countFinal() },
+    { title: 'Vaakst voorspelde uitslag (groepsfase)', icon: '📊', data: countGroupScores(), topN: 10 },
   ];
 
-  el.innerHTML = `<div class="stats-grid">${categories.map(c => makeCard(c.title, c.icon, c.data)).join('')}</div>`;
+  el.innerHTML = `<div class="stats-grid">${categories.map(c => makeCard(c.title, c.icon, c.data, c.topN)).join('')}</div>`;
 }
 
 // =============================================
@@ -3535,9 +3339,6 @@ function renderStatistieken() {
   checkDeadlineAndBlock();
   if (adminUnlocked) buildAdminPanel();
 
-  // Statistieken tab only visible after deadline
-  const statsNavBtn = document.querySelector('.nav-btn[onclick="showView(\'statistieken\')"]');
-  if (statsNavBtn) statsNavBtn.style.display = isPastDeadline() ? '' : 'none';
 })();
 </script>
 </body>
