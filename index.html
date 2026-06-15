@@ -1565,17 +1565,29 @@ function renderLeaderboard() {
   if (scored.length === 0) {
     body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><span class="empty-state-icon">📋</span><div class="empty-state-text">Nog geen voorspellingen</div><p style="font-size:12px;color:var(--fg-muted)">Deelnemers kunnen voorspellingen indienen via het formulier</p></div></td></tr>`;
   } else {
-    body.innerHTML = scored.map((p, i) => `
-      <tr class="rank-${i+1}" style="cursor:pointer" onclick="toggleParticipantDetail('${p.name.replace(/'/g,"\\'")}')">
-        <td class="rank-cell">${i+1}</td>
+    // Dense ranking: gelijke score én tiebreaker → zelfde plek, geen gat erna
+    let rank = 1;
+    const ranks = scored.map((p, i) => {
+      if (i > 0) {
+        const prev = scored[i - 1];
+        if (p.total !== prev.total || p.exactGroupCount !== prev.exactGroupCount) rank = i + 1;
+      }
+      return rank;
+    });
+
+    body.innerHTML = scored.map((p, i) => {
+      const r = ranks[i];
+      return `
+      <tr class="rank-${r <= 3 ? r : 'other'}" style="cursor:pointer" onclick="toggleParticipantDetail('${p.name.replace(/'/g,"\\'")}')">
+        <td class="rank-cell">${r}</td>
         <td><div class="participant-name">${p.name}</div></td>
         <td style="color:var(--fg-muted)">${p.groupPts}</td>
         <td style="color:var(--fg-muted)">${p.knockoutPts}</td>
         <td style="color:var(--gold)">${p.bonusPts > 0 ? '+'+p.bonusPts : '—'}</td>
         <td style="color:var(--fg-muted);font-family:'Bebas Neue';font-size:18px" title="Exacte groepsuitslagen (tiebreaker)">${p.exactGroupCount || 0}</td>
         <td class="score-cell">${p.total}</td>
-      </tr>
-    `).join('');
+      </tr>`;
+    }).join('');
   }
 
   const totalMatches = Object.values(GROUPS).reduce((s, g) => s + g.matches.length, 0);
