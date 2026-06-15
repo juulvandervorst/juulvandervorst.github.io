@@ -1511,17 +1511,17 @@ function scoreParticipant(p) {
     }
   }
 
-  // Groepsfase bonuspunten
+  // Groepsfase bonuspunten — op basis van exacte uitslagen
   let bonusLabel = '';
-  if (correctGroupCount >= 24) {
+  if (exactGroupCount >= 24) {
     bonusPts = POINTS.bonus_24;
-    bonusLabel = `24+ goede uitslagen (${correctGroupCount})`;
-  } else if (correctGroupCount >= 16) {
+    bonusLabel = `24+ exacte uitslagen (${exactGroupCount})`;
+  } else if (exactGroupCount >= 16) {
     bonusPts = POINTS.bonus_16;
-    bonusLabel = `16–23 goede uitslagen (${correctGroupCount})`;
-  } else if (correctGroupCount >= 8) {
+    bonusLabel = `16–23 exacte uitslagen (${exactGroupCount})`;
+  } else if (exactGroupCount >= 8) {
     bonusPts = POINTS.bonus_8;
-    bonusLabel = `8–15 goede uitslagen (${correctGroupCount})`;
+    bonusLabel = `8–15 exacte uitslagen (${exactGroupCount})`;
   }
 
   const rounds = [['r32', POINTS.r32], ['r16', POINTS.r16], ['qf', POINTS.qf], ['sf', POINTS.sf], ['final', POINTS.final]];
@@ -1537,13 +1537,13 @@ function scoreParticipant(p) {
     knockoutPts += POINTS.champion;
 
   if (p.top_scorer && results.top_scorer && p.top_scorer.toLowerCase() === results.top_scorer.toLowerCase())
-    knockoutPts += POINTS.top_scorer;
+    bonusPts += POINTS.top_scorer;
 
   if (p.first_scorer && results.first_scorer && p.first_scorer.toLowerCase() === results.first_scorer.toLowerCase())
-    knockoutPts += POINTS.first_scorer;
+    bonusPts += POINTS.first_scorer;
 
   if (p.last_scorer && results.last_scorer && p.last_scorer.toLowerCase() === results.last_scorer.toLowerCase())
-    knockoutPts += POINTS.last_scorer;
+    bonusPts += POINTS.last_scorer;
 
   return {
     groupPts, knockoutPts, bonusPts,
@@ -1621,8 +1621,8 @@ function toggleParticipantDetail(name) {
         <div style="font-size:11px;color:var(--fg-muted);margin-top:4px">🎯 <strong style="color:var(--fg)">${scored.exactGroupCount}</strong> exacte groepsuitslag${scored.exactGroupCount !== 1 ? 'en' : ''} (tiebreaker)</div>
         ${scored.bonusPts > 0
           ? `<div style="font-size:11px;color:var(--gold);margin-top:6px">🎯 +${scored.bonusPts} bonus — ${scored.bonusLabel}</div>`
-          : scored.correctGroupCount > 0
-          ? `<div style="font-size:11px;color:var(--fg-muted);margin-top:6px">${scored.correctGroupCount} goede groepsuitslagen</div>`
+          : scored.exactGroupCount > 0
+          ? `<div style="font-size:11px;color:var(--fg-muted);margin-top:6px">${scored.exactGroupCount} exacte groepsuitslagen</div>`
           : ''}
       </div>
       <div style="background:var(--detail-meta-bg);padding:12px;border:1px solid var(--border)">
