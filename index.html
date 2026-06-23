@@ -2607,6 +2607,7 @@ function buildBracketRound(containerId, round, savedKnockout) {
   if (!el) return;
   const slots = BRACKET_SLOTS[round] || [];
   const saved = savedKnockout || {};
+  const prefix = containerId.startsWith('admin-') ? 'admin_' : '';
 
   let html = '';
   slots.forEach(([label, phA, phB], i) => {
@@ -2616,9 +2617,9 @@ function buildBracketRound(containerId, round, savedKnockout) {
     const optsB = teamOptions(phA, phB, 'b').replace(`value="${valB}"`, `value="${valB}" selected`);
     html += `<div class="bracket-match">
       <div class="bracket-match-label">${label}</div>
-      <select id="bk_${round}_${i}_a" onchange="saveBracketPick('${round}')">${optsA}</select>
+      <select id="bk_${prefix}${round}_${i}_a" onchange="saveBracketPick('${round}', '${prefix}')">${optsA}</select>
       <div class="bracket-vs">vs</div>
-      <select id="bk_${round}_${i}_b" onchange="saveBracketPick('${round}')">${optsB}</select>
+      <select id="bk_${prefix}${round}_${i}_b" onchange="saveBracketPick('${round}', '${prefix}')">${optsB}</select>
     </div>`;
   });
   el.innerHTML = html;
@@ -2655,15 +2656,15 @@ function checkDeadlineAndBlock() {
   return true;
 }
 
-function saveBracketPick(round) {
+function saveBracketPick(round, prefix = '') {
   // Validate: no duplicate teams within a round
   const count = BRACKET_MATCH_COUNTS[round];
   const seen = {};
   for (let i = 0; i < count; i++) {
     for (const side of ['a', 'b']) {
-      const val = document.getElementById(`bk_${round}_${i}_${side}`)?.value;
+      const val = document.getElementById(`bk_${prefix}${round}_${i}_${side}`)?.value;
       if (!val) continue;
-      const key = `bk_${round}_${i}_${side}`;
+      const key = `bk_${prefix}${round}_${i}_${side}`;
       if (seen[val]) {
         // Reset this select to empty
         document.getElementById(key).value = '';
@@ -2676,11 +2677,12 @@ function saveBracketPick(round) {
 }
 
 function readBracketRoundById(containerId, round) {
+  const prefix = containerId.startsWith('admin-') ? 'admin_' : '';
   const count = BRACKET_MATCH_COUNTS[round];
   const result = {};
   for (let i = 0; i < count; i++) {
-    const a = document.getElementById(`bk_${round}_${i}_a`)?.value || '';
-    const b = document.getElementById(`bk_${round}_${i}_b`)?.value || '';
+    const a = document.getElementById(`bk_${prefix}${round}_${i}_a`)?.value || '';
+    const b = document.getElementById(`bk_${prefix}${round}_${i}_b`)?.value || '';
     if (a) result[`${i}_a`] = a;
     if (b) result[`${i}_b`] = b;
   }
